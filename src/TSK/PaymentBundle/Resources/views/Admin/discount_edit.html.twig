@@ -1,0 +1,64 @@
+{% extends 'SonataAdminBundle:CRUD:base_edit.html.twig' %}
+{% block javascripts %}
+    {{ parent() }}
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+    <script type="text/javascript">
+        // Your JS code here
+        function renderProgramDropdown($elem, inputName, inputValue) {
+            return true;
+            // optional argument
+            inputValue = (typeof inputValue === "undefined") ? "" : inputValue;
+            $.get(Routing.generate('tsk_program_default_dropdown', {programId: inputValue}), function(data) {
+                mydata = data.replace("form[value]", inputName);
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        $(document).ready(function() {
+            $('.factPicker').live('change', function() {
+                var $closestInput = $(this).closest('tr').find('input[type=text]');
+                var $closestSelect = $(this).closest('tr').find('select[name$="[value]"]');
+                if ($closestInput) {
+                    if (this.value == 11) {
+                        // renderProgramDropdown($closestInput, $closestInput.attr('name'), $closestInput.val());
+                    }
+                }
+            });
+            // For initial page loading
+            $('.factPicker').trigger('change');
+
+            $('div[id^="sonata-ba-field-container"][id$="rules"]').on('sonata.add_element', function(event) {
+                // redraw any program selects as dropdowns
+                // insert here your code
+                $('.factPicker').each(function(idx, o) {
+                    if ($(o).val() == 11) {
+                        var $closestInput = $(this).closest('tr').find('input[type=text]');
+                        renderProgramDropdown($closestInput, $closestInput.attr('name'), $closestInput.val());
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!--  // styling for rules -->
+    <style type="text/css">
+        .sonata-bc .row-fluid .conjunctionPicker {
+            width: 80%;
+        }
+        .sonata-collection-row .control-group .control-label {
+            width: 1px;
+            display: none;
+        }
+        .sonata-bc .form-horizontal td .controls {
+            margin-left: 10px;
+        }
+        .sonata-bc .form-horizontal .control-label {
+        }
+
+    </style>
+{% endblock %}
+

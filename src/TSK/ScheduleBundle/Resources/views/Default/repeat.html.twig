@@ -1,0 +1,188 @@
+<script type="text/javascript" src=" {{ asset('bundles/documentcloud/underscore/underscore.js') }}"></script>
+<script type="text/javascript" src=" {{ asset('bundles/jkbr/rrule/rrule.js') }}"></script>
+<script type="text/javascript" src=" {{ asset('bundles/jkbr/rrule/nlp.js') }}"></script>
+<script type="text/javascript">
+
+// parse a date in yyyy-mm-dd format
+function parseDate(input) {
+    var parts = input.split('-');
+    if (parts.length == 3) {
+        return new Date(parts[0], parts[1]-1, parts[2]); // months are 0-based
+    }
+}
+
+function compileRrule()
+{
+    // run rrule processing
+    var weekdays = [];
+    var rruleWeekdays = new Array();
+    rruleWeekdays['0'] = RRule.MO;
+    rruleWeekdays['1'] = RRule.TU;
+    rruleWeekdays['2'] = RRule.WE;
+    rruleWeekdays['3'] = RRule.TH;
+    rruleWeekdays['4'] = RRule.FR;
+    rruleWeekdays['5'] = RRule.SA;
+    rruleWeekdays['6'] = RRule.SU;
+    
+    $('input[name*="weekday"]:checked').each(function(idx, obj) { 
+        weekdays.push(rruleWeekdays[obj.value]);
+    });
+
+    rruleObj = {};
+    rruleObj.interval = $intervalControl.val();
+    if (weekdays.length) rruleObj.byweekday = weekdays;
+    if ($dtStartControl.val()) rruleObj.dtstart = parseDate($dtStartControl.val());
+    if ($untilControl.val()) {
+        rruleObj.until = parseDate($untilControl.val());
+    }
+    if ($countControl.val()) rruleObj.count = $countControl.val();
+    var rule = new RRule($freqControl.val(), rruleObj);
+    return rule;
+}
+
+$(document).ready(function() {
+    $freqControl = $('#tsk_schedule_repeat_options_frequency');
+    $intervalControl = $('#tsk_schedule_repeat_options_rinterval');
+    $countControl = $('#tsk_schedule_repeat_options_ends_num_occurrences');
+    $dtStartControl = $('#tsk_schedule_repeat_options_start');
+    $untilControl = $('#tsk_schedule_repeat_options_ends_until_date');
+ 
+    // Get any weekdays
+    var $weekDayControl = $('input[name*="weekday"]:checked');
+    var $freqText = $('#freq_text');
+    var $summary = $('#summary');
+    // Bind a custom event
+    $summary.bind('repeatSummaryUpdate', function(e) {
+        // console.log("frequency = " + $freqControl.val());
+        // console.log("interval = " + $intervalControl.val());
+        // console.log("count = " + $countControl.val());
+        // console.log("weekdays = " + weekdays.join());
+        // console.log("dtstart = " + $dtStartControl.val());
+        // console.log("until = " + $untilControl.val());
+        // console.log("until = " + parseDate($untilControl.val()));
+        
+        rule = compileRrule();       
+        $summary.html(rule.toText());
+    });
+
+    // Trigger summary update on change of any input or select
+    $('#repeatForm input, #repeatForm select').change(function() {
+        $summary.trigger('repeatSummaryUpdate');
+    });
+
+    $('input[type="radio"][name*="ends_type"]').change(function(){
+        if (this.value == 'after') {
+            // set num occurences 
+            $countControl.val(30);
+            // set until date
+            $untilControl.val('');
+        }
+        if (this.value == 'until') {
+            // set num occurrences
+            $countControl.val('');
+            // set until date to default date
+            $untilControl.val('2013-10-02');
+        }
+        if (this.value == 'never') {
+            // set num occurrences
+            $countControl.val('');
+            // set until date
+            $untilControl.val('');
+        }
+        $summary.trigger('repeatSummaryUpdate');
+    });
+
+    $freqControl.change(function() {
+        var intervals = new Array();
+        intervals['3'] = 'day(s)';
+        intervals['2'] = 'week(s)';
+        intervals['1'] = 'month(s)';
+        intervals['0'] = 'year(s)';
+
+        if (intervals[this.value]) {
+            $freqText.html(intervals[this.value]);
+        } else {
+            alert('invalid interval');
+        }
+
+        // Reset interval to 1
+        $intervalControl.val(1);
+
+        // Hide all repeat qualifier controls
+        $('.repeat_qualifier').hide();
+        if (this.value == '1') {
+            $('#repeatMonthDay').show();
+        }
+        if (this.value == '2') {
+            $('#repeatWeekDay').show();
+        }
+
+        // Uncheck all weekday checkboxes
+        $('input[name*="weekday"]').each(function(idx, obj) { 
+            $(obj).prop('checked', false);
+        });
+
+    });
+
+    // if an until date is set, make sure the until radio button is checked
+    $untilControl.change(function() {
+        if (this.value) {
+            $('input[type="radio"][name*="ends_type"][value="until"]').attr('checked', 'checked');
+        }
+    });
+
+    $('#btnDone').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // save rrule to parent form
+        rule = compileRrule();
+        $('.rruleElem').val(rule.toString());
+        $('#recurringSummary').html(': <b>' + rule.toText() + '</b> <a href="#" id="editRecur">edit</a>');
+
+            $('#editRecur').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $('#repeatDiv').dialog('open');
+                return false;
+            });
+
+        $('#repeatDiv').dialog('close');
+        return false;
+    });
+
+    $('#btnCancel').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#repeatDiv').dialog('close');
+        return false;
+    });
+});
+</script>
+<form id="repeatForm" class="form-horizontal">
+    {{ form_errors(form) }}
+    {{ form_row(form.frequency) }}
+    {{ form_label(form.rinterval) }}
+    <div class="control-group">
+        <div class="controls">
+        {{ form_widget(form.rinterval) }}
+            <span id="freq_text">day(s)</span>
+        </div>
+    </div>
+    <div id="repeatWeekDay" class="repeat_qualifier" style="display:none">
+    {{ form_row(form.repeat_weekday) }} 
+    </div>
+    <div id="repeatMonthDay" class="repeat_qualifier" style="display:none">
+    {{ form_row(form.repeat_monthday) }} 
+    </div>
+    {{ form_row(form.start) }}
+    {{ form_row(form.ends) }}
+
+    <div class="control-group">
+        <label class="control-label">Summary</label>
+        <div class="controls" style="padding-top: 5px; line-height: 20px;">
+            <span id="summary"></span>
+        </div>
+    </div>
+        <input type="submit" value="Done" id="btnDone" class="symfony-button-grey" />
+        <input type="submit" value="Cancel" id="btnCancel" class="symfony-button-grey" />
+</form>

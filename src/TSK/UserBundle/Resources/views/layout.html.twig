@@ -1,0 +1,57 @@
+{% extends 'MopaBootstrapBundle::base.html.twig' %}
+
+    {% block head_style %}
+    {# Override this block to add your own files! #}
+    {% stylesheets filter='less,cssrewrite'
+        '@MopaBootstrapBundle/Resources/public/less/mopabootstrapbundle.less'
+    %}  
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+    {% endstylesheets %}
+    {# To use this without less use the base_css.html.twig template as your base
+     # Be sure you understand whats going on: have a look into
+     # https://github.com/phiamo/MopaBootstrapBundle/blob/master/Resources/doc/css-vs-less.md
+     #}  
+    {% endblock head_style %}
+
+
+{% block title %}TSK :: App{% endblock %}
+{% block page_header %}<br/><br/><br/>{% endblock %}
+
+    {% block navbar %}
+        {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+            {% embed '@MopaBootstrap/Navbar/navbar.html.twig' with { fixedTop: true, inverse: true } %}
+                {% block menu %}
+                    {{ mopa_bootstrap_menu('TSKUserBundle:Builder:mainMenu') }}
+                    {{ mopa_bootstrap_menu('TSKUserBundle:Builder:rightSideMenu') }}
+                {% endblock %}
+            {% endembed %}
+        {% endif %}
+    {% endblock navbar %}
+
+{% block content %}
+        <div>
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                <a href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
+            {% else %}
+                <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
+            {% endif %}
+        </div>
+
+        {% for key, message in app.session.flashbag.all() %}
+        <div class="{{ key }}">
+            {{ message|trans({}, 'FOSUserBundle') }}
+        </div>
+        {% endfor %}
+
+        <div>
+            {% block fos_user_content %}
+            {% endblock fos_user_content %}
+        </div>
+{% endblock content %}
+
+{% block footer %}
+        <p>&copy; <a href="http://tsk.com" target="_blank">TSK</a> 2013</p>
+{% endblock footer %}

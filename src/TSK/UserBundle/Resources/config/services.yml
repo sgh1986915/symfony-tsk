@@ -1,0 +1,298 @@
+parameters:
+    security.acl.permission.map.class: Sonata\AdminBundle\Security\Acl\Permission\AdminPermissionMap
+    tsk_user.session.school_key: "tsk_school_id"
+    tsk_user.session.org_key: "tsk_organization_id"
+    tsk_user.org_update_listener.allowed_classes: ['TSK\UserBundle\Entity\Contact', 'TSK\ClassBundle\Entity\Classes', 'TSK\ClassBundle\Entity\ClassType', 'TSK\ProgramBundle\Entity\ProgramType', 'TSK\ProgramBundle\Entity\MembershipType', 'TSK\ProgramBundle\Entity\Program', 'TSK\PaymentBundle\Entity\Deferral', 'TSK\PaymentBundle\Entity\PaymentMethod', 'TSK\ScheduleBundle\Entity\ScheduleLocation', 'TSK\ScheduleBundle\Entity\ScheduleCategory', 'TSK\UserBundle\Entity\Role', 'TSK\ContractBundle\Entity\ContractClause', 'TSK\ContractBundle\Entity\ContractTemplate', 'TSK\ContractBundle\Entity\ContractLog', 'TSK\RulerBundle\Entity\Fact', 'TSK\PaymentBundle\Entity\Discount', 'TSK\RankBundle\Entity\Rank', 'TSK\ContractBundle\Entity\Contract', 'TSK\PaymentBundle\Entity\Product']
+    tsk_user.security.acl.protected_classes:  ['TSK\UserBundle\Entity\Contact', 'TSK\ClassBundle\Entity\Classes', 'TSK\ClassBundle\Entity\ClassType', 'TSK\ProgramBundle\Entity\ProgramType', 'TSK\ProgramBundle\Entity\Program', 'TSK\PaymentBundle\Entity\Deferral', 'TSK\PaymentBundle\Entity\PaymentMethod', 'TSK\ScheduleBundle\Entity\ScheduleLocation', 'TSK\ScheduleBundle\Entity\ScheduleCategory', 'TSK\StudentBundle\Entity\Student', 'TSK\ScheduleBundle\Entity\ScheduleInstance', 'TSK\ScheduleBundle\Entity\ScheduleEntity', 'TSK\PaymentBundle\Entity\Charge', 'TSK\PaymentBundle\Entity\Payment', 'TSK\ContractBundle\Entity\Contract', 'Proxies\__CG__\TSK\UserBundle\Entity\Contact']
+
+services:
+    tsk_user.org_session:
+        class: TSK\UserBundle\EventListener\OrgSessionListener
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.session.school_key%]
+        tags:
+            - { name: kernel.event_subscriber }
+
+#     tsk_user.login_history:
+#         class: TSK\UserBundle\EventListener\LoginHistoryListener
+#         arguments: [@request, @doctrine.orm.default_entity_manager]
+#         scope: request # needed as we have the request as a dependency here
+#         tags:
+#             - { name: kernel.event_subscriber }
+
+    tsk_user.entity_hidden.form_type:
+        class: TSK\UserBundle\Form\Type\EntityHiddenType
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: form.type, alias: entity_hidden }
+
+    tsk_user.entity_checkbox.form_type:
+        class: TSK\UserBundle\Form\Type\EntityCheckboxType
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: form.type, alias: entity_checkbox }
+
+
+    tsk_user.organization.form_type:
+        class: TSK\UserBundle\Form\Type\OrganizationType
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: form.type, alias: tsk_organization_form_type }
+
+    tsk_user.contact_search.form_type:
+        class: TSK\UserBundle\Form\Type\ContactSearchType
+        arguments: [@doctrine.orm.entity_manager]
+        scope: prototype
+        tags:
+            - { name: form.type, alias: tsk_contact_list }
+
+    tsk.admin.contact:
+        class: TSK\UserBundle\Admin\ContactAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Contacts" }
+        arguments: [null, TSK\UserBundle\Entity\Contact, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+            - [ setTemplate, ['base_list_field', 'TSKUserBundle:CRUD:base_list_field.html.twig'] ]
+
+
+    tsk.admin.contact_billee:
+        class: TSK\UserBundle\Admin\ContactBilleeAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Billee Contacts", show_in_dashboard: false }
+        arguments: [null, TSK\UserBundle\Entity\Contact, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+            - [ setTemplate, ['base_list_field', 'TSKUserBundle:CRUD:base_list_field.html.twig'] ]
+
+    tsk.admin.contact_emergency:
+        class: TSK\UserBundle\Admin\ContactEmergencyAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Emergency Contacts", show_in_dashboard: false }
+        arguments: [null, TSK\UserBundle\Entity\Contact, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+            - [ setTemplate, ['base_list_field', 'TSKUserBundle:CRUD:base_list_field.html.twig'] ]
+
+    tsk.admin.contact_student:
+        class: TSK\UserBundle\Admin\ContactStudentAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Student Contacts", show_in_dashboard: false }
+        arguments: [null, TSK\UserBundle\Entity\Contact, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+            - [ setTemplate, ['base_list_field', 'TSKUserBundle:CRUD:base_list_field.html.twig'] ]
+
+    tsk.admin.user:
+        class: TSK\UserBundle\Admin\UserAdmin
+        arguments: [null, TSK\UserBundle\Entity\User, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Users"}
+        calls:
+            - [ setUserManager, [@fos_user.user_manager] ]
+            - [ setTemplate, ['base_list_field', 'TSKUserBundle:CRUD:base_list_field.html.twig'] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+
+    tsk_user.admin.organizations:
+        class: TSK\UserBundle\Admin\OrganizationAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Organizations", label: "Organizations" }
+        arguments: [null, TSK\UserBundle\Entity\Organization, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk_user.admin.role:
+        class: TSK\UserBundle\Admin\RoleAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Organizations", label: "Roles" }
+        arguments: [null, TSK\UserBundle\Entity\Role, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk_rank.admin.rank_extension] ]
+
+
+    tsk_user.admin.corporation:
+        class: TSK\UserBundle\Admin\CorporationAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Corporations" }
+        arguments: [null, TSK\UserBundle\Entity\Corporation, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+
+    tsk_user.twig.formatting_extension:
+        class: TSK\UserBundle\Twig\Extension\FormattingExtension
+        arguments: [%kernel.root_dir%]
+        tags:
+            - { name: twig.extension }
+
+    tsk_user.twig.contact_image_extension:
+        class: TSK\UserBundle\Twig\Extension\ContactImageExtension
+        arguments: [%kernel.root_dir%]
+        tags:
+            - { name: twig.extension }
+
+    tsk_user.admin.block.org_switcher:
+        class: TSK\UserBundle\Block\OrgSwitcherBlockService
+        arguments: ['tsk_user.admin.block.org_switcher', @templating, @doctrine.orm.default_entity_manager, @session, %tsk_user.session.org_key%]
+        tags:
+            - { name: sonata.block }
+
+    tsk_user.admin.block.erp_context_switcher:
+        class: TSK\UserBundle\Block\ErpContextSwitcherBlockService
+        arguments: ['tsk_user.admin.block.erp_context_switcher', @templating, @doctrine.orm.default_entity_manager, @session, @form.factory, @security.context]
+        tags:
+            - { name: sonata.block }
+
+    tsk.admin.contact_extension:
+        class: TSK\UserBundle\Admin\ContactAdminExtension
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.session.school_key%]
+        tags:
+            - { name: sonata.admin.extension }
+
+    tsk_user.user_manager.default:
+        class: TSK\UserBundle\Doctrine\UserManager
+        arguments: [@security.encoder_factory, @fos_user.util.username_canonicalizer, @fos_user.util.email_canonicalizer, @fos_user.entity_manager, %fos_user.model.user.class%]
+
+    tsk_user.form.type.identity_dropdown:
+        class: TSK\UserBundle\Form\Type\IdentityDropdownType
+        arguments: [@doctrine.orm.entity_manager, @sonata.admin.pool, @security.context, %security.role_hierarchy.roles%]
+        tags:
+            - { name: form.type, alias: tsk_identity_dropdown }
+ 
+    tsk_user.form.type.permission_type:
+        class: TSK\UserBundle\Form\Type\PermissionType
+        tags:
+            - { name: form.type, alias: tsk_permission_type }
+
+    tsk_user.form.type.perm_bit:
+        class: TSK\UserBundle\Form\Type\PermBitsType
+        tags:
+            - { name: form.type, alias: tsk_permbits }
+ 
+    tsk_user.permissions.sonata_permissions_manager:
+        class: TSK\UserBundle\Permissions\SonataPermissionsManager 
+        arguments: [@doctrine.dbal.default_connection, @sonata.admin.pool, @security.acl.provider, @service_container]
+        tags:
+            - { name: tsk.permission.mgr, alias: sonata_permission_mgr }
+
+    tsk_user.permissions.route_permissions_manager:
+        class: TSK\UserBundle\Permissions\RoutePermissionsManager 
+        arguments: [@doctrine.dbal.default_connection, @service_container]
+        tags:
+            - { name: tsk.permission.mgr, alias: route_permission_mgr }
+
+
+    tsk_user.permissions.object_permissions_manager:
+        class: TSK\UserBundle\Permissions\ObjectPermissionsManager 
+        arguments: [@doctrine.orm.default_entity_manager, @security.acl.provider]
+        tags:
+            - { name: tsk.permission.mgr, alias: object_permission_mgr }
+
+
+    tsk_user.security.acl.permission.map:
+        class: %security.acl.permission.map.class%
+        # %sonata.admin.security.mask.builder.class%
+ 
+
+#     tsk_user.security.role.role_hierarchy:
+#         class: TSK\UserBundle\Security\Role\RoleHierarchy
+#         arguments: [@doctrine.orm.default_entity_manager, @session, %tsk_user.session.org_key%]
+# 
+    tsk_user.form.type.role_type:
+        class: TSK\UserBundle\Form\Type\RoleType
+        arguments: [@doctrine.orm.default_entity_manager]
+        tags:
+            - { name: form.type, alias: tsk_role_type }
+
+    tsk_user.security.authorization.voter.sonata_acl_voter:
+        class: TSK\UserBundle\Security\Authorization\Voter\SonataAclVoter
+        public: false
+        arguments: 
+          - '@security.acl.provider'
+          - '@security.acl.object_identity_retrieval_strategy'
+          - '@security.acl.security_identity_retrieval_strategy'
+          - '@tsk_user.security.acl.permission.map' 
+          - '@?logger'   
+        tags:
+            - { name: security.voter , priority: 255 }           
+            - { name: monolog.logger , channel: security } 
+
+    tsk_user.school_acl_listener.post_persist:
+        class: TSK\UserBundle\EventListener\SchoolAclListener
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.session.school_key% ]
+        tags:
+           - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+
+    tsk_user.org_update_listener.pre_persist:
+        class: TSK\UserBundle\EventListener\OrgUpdateListener
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.org_update_listener.allowed_classes%]
+        tags:
+            - { name: doctrine.event_listener, event: prePersist, method: prePersist }
+
+    tsk_user.org_update_listener.pre_update:
+        class: TSK\UserBundle\EventListener\OrgUpdateListener
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.org_update_listener.allowed_classes%]
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate, method: preUpdate }
+
+
+    tsk_user.security.tsk_acl_security_handler:
+        class: TSK\UserBundle\Security\Handler\TSKAclSecurityHandler
+        arguments: [@security.context, @security.acl.provider, %sonata.admin.security.mask.builder.class%, [ROLE_SUPER_ADMIN]]
+        calls:
+            - [ setAdminPermissions, [%sonata.admin.configuration.security.admin_permissions%] ]
+            - [ setObjectPermissions, [%sonata.admin.configuration.security.object_permissions%] ]
+
+    tsk_user.security.school_object_voter:
+        class: TSK\UserBundle\Security\Authorization\Voter\SchoolObjectVoter
+        arguments: [@session, %tsk_user.session.school_key%, %tsk_user.security.acl.protected_classes%, @tsk_user.security.acl.permission.map, @security.acl.security_identity_retrieval_strategy, @security.acl.object_identity_retrieval_strategy, @security.acl.provider]
+        public: false
+        tags:
+            - { name: security.voter }
+
+    tsk_user.security.org_object_voter:
+        class: TSK\UserBundle\Security\Authorization\Voter\OrgObjectVoter
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.security.acl.protected_classes%, @tsk_user.security.acl.permission.map, @security.acl.security_identity_retrieval_strategy, @security.acl.object_identity_retrieval_strategy, @security.acl.provider]
+        public: false
+        tags:
+            - { name: security.voter }
+
+    tsk_user.security.aged_contact_edit_voter:
+        class: TSK\UserBundle\Security\Authorization\Voter\AgedContactEditVoter
+        arguments: [@security.acl.security_identity_retrieval_strategy, 600]
+        public: false
+        tags:
+            - { name: security.voter }
+
+
+    #   Commenting out this listener, because we get a race condition when
+    #   first starting.  Orgs create roles when first created, but roles may not exist.
+    # tsk_user.event_listener.org_role_listener:
+    #     class: TSK\UserBundle\EventListener\OrgRoleListener
+    #     tags:
+    #         - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+
+    tsk_user.phone_canonicalizer:
+        class: TSK\UserBundle\Canonicalizer\PhoneNumberCanonicalizer
+
+    tsk_user.postal_code_canonicalizer:
+        class: TSK\UserBundle\Canonicalizer\PostalCodeCanonicalizer
+
+
+    tsk_user.contact_manager:
+        class: TSK\UserBundle\Doctrine\ContactManager
+        arguments: [@fos_user.util.email_canonicalizer, @tsk_user.phone_canonicalizer, @tsk_user.postal_code_canonicalizer, @fos_user.entity_manager, 'TSK\UserBundle\Entity\Contact']
+
+    tsk.admin.instructor:
+        class: TSK\InstructorBundle\Admin\InstructorAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Instructors" }
+        arguments: [null, TSK\InstructorBundle\Entity\Instructor, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+

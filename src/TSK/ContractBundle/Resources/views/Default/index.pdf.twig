@@ -1,0 +1,78 @@
+<pdf>
+    <dynamic-page>
+        <div id="section_header" font-style="bold" font-size="14px" color="black">
+                <stylesheet>
+                    <attribute name="text-align" value="center" />
+                </stylesheet>
+            - AGREEMENT -
+        </div>
+
+        <div>
+            <p margin-bottom="2px">
+                <stylesheet>
+                    <attribute name="margin-top" value="10px" />
+                    <attribute name="padding-top" value="1px" />
+                    <attribute name="padding-bottom" value="1px" />
+                    <attribute name="margin-bottom" value="19px" />
+                </stylesheet>
+                {{ school.getContact.getFirstName }} {{ school.getContact.getLastName }}
+                <br/>{{ school.getContact.getAddress1 }}
+                <br/>{{ school.getContact.getCity }}, {{ school.getContact.getState }} {{ school.getContact.getPostalcode }}  {{ school.getContact.getPhone}}
+            </p>
+        </div>
+        <div extends="section_header">
+            - INTRODUCTION -
+        </div>
+        <div id="section" margin-bottom="20px" text-align="justify">
+            This Agreement is made between the above named corporation d/b/a {{ orgName }} ("{{ abbrOrgName }}") and {{ student.getContact }} or the undersigned legal guardian if he/she is a minor ("Student").  In consideration of the {{ contract.getProgramLegalDescription }} to be provided by {{ abbrOrgName }} as described below, Student agrees to pay {{ abbrOrgName }} tuition as follows:  {{ installments }}.  Student agrees to pay a late charge of <span color="red">${{ school.getLatePaymentCharge|number_format(2, '.', ',') }}</span> for each monthly payment not paid within <span color="red">{{ school.getLateGraceDays }}</span> days of its due date.  Student acknowledges that pre-authorized credit card charges or automatic bank account debits are the only methods by which monthly payments can be paid.  Student hereby expressly authorizes Student's bank/credit card co. to automatically make these payments on his/her behalf, and to accept the signature on this agreement as authorization for such charges to the same extent as if it were on a withdrawal slip or credit card sales draft.  If any 2 installments remain unpaid past their due dates (a "default"), the entire balance owing under this agreement shall be immediately due and payable, along with the costs of collection and reasonable attorney's fees.  In the event of a default, {{ abbrOrgName }} is hereby authorized to charge the full outstanding balance due (including attorney's fees and costs of collection) to the credit card or bank account furnished to {{ abbrOrgName }} hereunder.  Tuition charges do not include required protective gear, which must be purchased prior to participation in class.
+        </div>
+
+        <div extends="section_header">
+            - {{ abbrOrgName }} PROGRAM AND PHILOSOPHY -
+        </div>
+        <div extends="section">
+{{ abbrOrgName }} shall provide a program of {{ contract.getProgramLegalDescription }} to Student consisting of unlimited instruction for a term of 12 months from the date of this agreement in accordance with {{ abbrOrgName }}'s Standard curriculum.  
+
+
+The martial arts program purchased under this agreement is a non-severable course of instruction which includes all testing, promotion, and belt fees except for Black Belt or any degree of Black Belt.  There is a one-time test fee for each degree of Black Belt.  The current fee is ${{ blackBeltFee|number_format(2) }} (subject to increases of not more than ten percent per annum.)  
+
+
+Student acknowledges that {{ abbrOrgName }} has been specifically induced into enrolling him/her by his/her promise to attend and pay for the full term of this agreement.  Student further acknowledges that {{ abbrOrgName }} would not enter into this agreement with him/her in the absence of such a promise.  Student has been informed that {{ abbrOrgName }} has refrained from offering instruction to another person because it is limited ot the number of students it may instruct by space and staffing restrictions.  Therefore, Student agrees to pay all sums due under this agreement whether or not he/she attends any or all of the classes purchased.  Student's membership shall remain in effect for the period stated above, and shall automatically renew for successive one year periods at the prevailing monthly rate, unless either party provides notice of cancellation to the other.  Such notice must be given at least sixty (60) days prior to the end of the contract term.  Provided Student has made all payments due in a timely manner and has not defaulted, {{ abbrOrgName }} will extend the term of Student's membership for 1 additional month at no charge.
+        </div>
+
+        <div extends="section_header">
+            - REFUND POLICY -
+        </div>
+        <div extends="section">
+        {{ refundPolicy }}
+        </div>
+
+
+        {% if cancelPolicy %}
+        <div extends="section_header">
+            - BUYER'S RIGHT TO CANCEL  -
+        </div>
+        <div extends="section">
+        {{ cancelPolicy }}
+        </div>
+        {% endif %}
+
+        <div extends="section_header">
+            - WAIVER OF LIABILITY AND MODEL RELEASE -
+        </div>
+        <div extends="section">
+Student understands that participation in martial arts and martial artis instruction involves physical exertion and contact.  Student acknowledges that participation in martial arts and martial arts instruction is dangerous and that there is a risk of injury involved in the activity.  Student agrees to waive any claim, and to release {{ abbrOrgName }} and its employees and agents, from any claim for injuries sustained as a result of participation in martial arts and martial arts classes, including injuries claimed to have been caused by the negligence of {{ abbrOrgName }}, its agents and employees.  This release and waiver does not apply to any act of willful misconduct or gross negligence.  Student hereby consents to the use of his/her likeness in any photographs, film, or video tape in connection with the advertising or promotion of {{ orgName }}s.
+        </div>
+
+            <table border.type="none">
+                <tr margin-bottom="25px">
+                    <td border.type="top" padding="5px" margin-right="5px" font-style="bold">{{ abbrOrgName }}</td>
+                    <td border.type="top" padding="5px" margin-left="5px" font-style="bold">STUDENT</td>
+                </tr>
+                <tr>
+                    <td border.type="top" padding="5px" margin-right="5px" font-style="bold">DATE</td>
+                    <td border.type="top" padding="5px" margin-left="5px" font-style="bold">PARENT IF MINOR</td>
+                </tr>
+            </table>
+    </dynamic-page>
+</pdf>

@@ -1,0 +1,29 @@
+{#
+
+This file is part of the Sonata package.
+
+(c) Thomas Rabaix <thomas.rabaix@sonata-project.org>
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+
+#}
+
+{% if admin.isGranted('EDIT', object) and admin.hasRoute('edit') %}
+<div class="btn-group">
+{% if object.getActiveContract %}
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    Contract <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="{{ path('admin_tsk_contract_contract_edit', {'id': object.getActiveContract.getId}) }}">Modify</a></li>
+    <li><a href="{{ path('tsk_student_contract_renew', {'contractId': object.getActiveContract.getId}) }}">Renew</a></li>
+{% if object.getActiveContract.getContractNumTokens > 1 %}
+    <li><a href="{{ path('tsk_contract_default_index', {'id': object.getId}) }}">Add Student to Contract</a></li>
+{% endif %}
+    <li><a href="{{ path('tsk_contract_cancel', {'id': object.getActiveContract.getId}) }}">Cancel</a></li>
+    <li><a href="{{ path('tsk_contract_freeze', {'id': object.getActiveContract.getId}) }}">Freeze</a></li>
+  </ul>
+{% endif %}
+</div>
+{% endif %}

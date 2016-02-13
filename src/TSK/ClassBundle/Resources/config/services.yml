@@ -1,0 +1,47 @@
+parameters:
+    tsk_class.schedule.colors:
+        - { '#cc0000': 'red', '#00cc00': 'green', '#0000cc': 'blue' }
+
+    tsk_class.imports.class_file: "%kernel.root_dir%/../src/TSK/ClassBundle/Resources/files/classes.csv"
+    tsk_class.imports.class_type_credit_file: "%kernel.root_dir%/../src/TSK/ClassBundle/Resources/files/class_type_credit.csv"
+
+services:
+    tsk.admin.classes:
+        class: TSK\ClassBundle\Admin\ClassesAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Classes", label: "Classes" }
+        arguments: [null, TSK\ClassBundle\Entity\Classes, SonataAdminBundle:CRUD]
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setOrgSessionKey, [%tsk_user.session.org_key%] ]
+            - [ setTemplate, ['edit', 'TSKClassBundle:CRUD:edit.html.twig'] ]
+
+    tsk.admin.class_types:
+        class: TSK\ClassBundle\Admin\ClassTypeAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Classes", label: "ClassTypes" }
+        arguments: [null, TSK\ClassBundle\Entity\ClassType, SonataAdminBundle:CRUD]
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.class_type_credit:
+        class: TSK\ClassBundle\Admin\ClassTypeCreditAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Classes", label: "ClassTypeCredit" }
+        arguments: [null, TSK\ClassBundle\Entity\ClassTypeCredit, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.class_extension:
+        class: TSK\ClassBundle\Admin\ClassAdminExtension
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: sonata.admin.extension }
+
+
+    tsk_class.form.type.schedule_color_type:
+        class: TSK\ClassBundle\Form\Type\ScheduleColorType
+        tags: 
+            - { name: form.type, alias: tsk_class_schedule_color_type }

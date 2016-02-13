@@ -1,0 +1,201 @@
+{% extends "TSKStudentBundle::layout.html.twig" %}
+{% set _rs = form.vars.value %}
+{% block head_script %}
+    {{ parent() }}
+  
+<link rel="stylesheet" href="/bundles/sonatajquery/themes/flick/jquery-ui-1.8.16.custom.css" type="text/css" media="all" />
+<script src="/bundles/sonatajquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-1.8.23.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-i18n.js" type="text/javascript"></script>
+
+<script src="/bundles/malaney/PaymentCalculator/src/PaymentCalculator.js" type="text/javascript"></script>
+<script src="/bundles/janl/mustache.js/mustache.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/base.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/jquery/jquery.form.js" type="text/javascript"></script>
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+
+    $('#contractUpgrade_paymentPlanCustomizedPayments_paymentsData').change(function() {
+        try {
+            obj = JSON.parse(this.value);
+            console.log(obj);
+            paymentCalculator = new PaymentCalculator();
+            paymentCalculator.import(obj);
+            paymentCalculator.zeroOutInitialPayments();
+            payments = paymentCalculator.generatePayments();
+            foo = paymentCalculator.export();
+            $('span.paycal_txt a').html(foo.summary);
+            $('span.paycal_txt').show();
+            this.value = JSON.stringify(foo);
+        } catch (err) {
+            alert(err);
+        }
+    });
+
+            // $('div.paycal_txt a').click(function(e) {
+            $('.btnPaymentCalculator, span.paycal_txt a').click(function(e) {
+                // load payment
+                obj = JSON.parse($('#contractUpgrade_paymentPlanCustomizedPayments_paymentsData').val());
+                var url = '{{path('tsk_payment_default_cust')}}';
+                var d = openInDialog(this, url, {'paymentsData': obj});
+                e.preventDefault();
+                return false;
+            });
+
+
+    $('#contractUpgrade_programPaymentPlan').change(function() {
+        if (this.value) {
+            // populate paymentPlan with json data
+            $.get(Routing.generate('tsk_payment_default_plan', { program_payment_plan_id: this.value }), function(data) {
+                var paymentsData = JSON.parse(data.paymentsData);
+                $('div.paycal_txt a').html(paymentsData.summary);
+                $('#contractUpgrade_paymentPlanCustomizedPayments_paymentsData').val(data.paymentsData);
+            });
+        }
+    });
+
+    $dialog = $('<div></div>').dialog({
+        autoOpen: false,
+        width: 580,
+        modal: true,
+        show: 'fade',
+        hide: 'fade'
+    });
+
+    function openInDialog(element, target, data) 
+    {
+        var $url = target;
+        var $title = "Customize Payment Calculator"; 
+        $dialog.empty();
+        $dialog.dialog("option", "title", $title);
+
+        $.data(element, 'summary_div', $('.paycal_txt a'));
+        if (data) {
+            $dialog.load($url, data, function() {
+                $dialog.data('summary_div', $('div.paycal_txt a')).data('textarea', $('#contractUpgrade_paymentPlanCustomizedPayments_paymentsData')).dialog('open');
+            });
+        } else {
+            $dialog.load($url, function() {
+                $dialog.dialog('open');
+            });
+        }
+        return $dialog;
+    }
+
+    $('.xxbtnPaymentCalculator').click(function(e) {
+        var custPayments = $('#contractUpgrade_paymentPlanCustomizedPayments').val();
+        var url = '{{path('tsk_payment_default_cust')}}/?paymentsData=' + custPayments;
+        var d = openInDialog(this, url);
+        // alert('howdy');
+        e.preventDefault();
+        return false;
+    });
+    $('#contractUpgrade_paymentPlanCustomizedPayments_paymentsData').trigger('change');
+});
+</script>
+
+{% endblock head_script %}
+{% block head_style %}
+    {{ parent() }} 
+    {% stylesheets '@CraueFormFlowBundle/Resources/assets/css/buttons.css' %}
+    	<link type="text/css" rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock head_style %}
+{% block fos_user_content %}
+<style type="text/css">
+li.craue_formflow_skipped_step {
+    display: none;
+}
+</style>
+
+    <div class="row">
+        <div class="span6">
+
+
+<h2>Contract Preview</h2>
+    <table class="table">
+        <tr>
+            <th class="span2 pull-right">Student(s)</th>
+            <td>
+                {% for student in contract.getStudents %}
+                    <a href="{{ path('admin_tsk_student_student_edit', {id: student.getId })}}">{{ student }}</a>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <th>School</th>
+            <td><a href="{{ path('admin_tsk_school_school_edit', {id: contract.getSchool.getId })}}">{{ contract.getSchool }}</a></td>
+        </tr>
+        <tr>
+            <th>Program</th>
+            <td>
+                <a href="{{ path('admin_tsk_program_program_edit', {id: contract.getProgram.getId })}}">{{ contract.getProgram.getProgramName }}</a> ({{ contract.getProgram.getMembershipType.getName}})
+            </td>
+        </tr>
+        <tr>
+            <th>Payment Plan</th>
+            <td>
+                {{ get_payment_calculator_data(contract.getPaymentTerms['paymentsData'], 'summary') }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>Start Date</th><td>{{ contract.getContractStartDate|date('F j, Y') }}</td>
+        </tr>
+        <tr>
+            <th>End Date</th><td>{{ contract.getContractExpiry|date('F j, Y') }}</td>
+        </tr>
+<!--
+        <tr>
+            <th>Active</th><td>{% if contract.getIsActive %}yes{% else %}no{% endif %}</td>
+        </tr>
+-->
+        <tr>
+            <th>Total</th><td>{{ format_money(get_payment_calculator_data(contract.getPaymentTerms['paymentsData'], 'principal')) }}</td>
+        </tr>
+        <tr>
+            <th>Amount Paid</th><td>{{ format_money(contract.getAmountPaid) }}</td>
+        </tr>
+        <tr>
+            <th>Balance</th>
+            <td>
+                Days Remaining: {{ contract.getBalanceInDays() }}<br/>
+                Dollars Remaining: {{ format_money(contract.getDollarsRemaining()) }}<br/>
+                Monies Paid:  {{ format_money(contract.getAmountPaid()) }}<br/>
+                Monies Consumed:  {{ format_money(contract.getDollarsConsumed()) }}<br/>
+                Credit Due: {{ format_money(contract.getCreditDue() )}}<br/>
+                Days Consumed: {{ contract.getDaysConsumed() }}<br/>
+            </td>
+        </tr>
+    </table>
+        </div>
+        <div class="span3">
+            <h3>Upgrade</h3>
+            <div style="display: none;">
+                Steps:
+                {% include 'CraueFormFlowBundle:FormFlow:stepList.html.twig' %}
+            </div>
+            
+            <form method="post" {{ form_enctype(form) }}>
+    {% if flow.getCurrentStep() == 6 %}
+        Here's your summary<br/>
+        <div>Program {{ _rs.getProgram.getProgramName }}</div>
+        <div>Original Cost {{ format_money(_rs.getProgramPrincipal) }}</div>
+        <div>Credits {{ format_money(_rs.getContract.getCreditDue() )}}</div>
+        <div>Amount Due {{ format_money(_rs.getAmountDue() )}}</div>
+        <div>Payment Plan {{ get_payment_calculator_data(_rs.getPaymentPlanCustomizedPayments['paymentsData'], 'summary') }}</div>
+        <div>Start Date {{ today|date('F j, Y') }}</div>
+        {% set durationDays = "+" ~ _rs.getProgram.getDurationDays ~ " days"%}
+        <div>End Date {{ today | date_modify(durationDays)|date('F j, Y') }}</div>
+    {% endif %}
+                {% include 'CraueFormFlowBundle:FormFlow:stepField.html.twig' %}
+                {{ form_errors(form) }}
+                {{ form_rest(form) }}
+                <div id="foo"></div>
+                {% include 'CraueFormFlowBundle:FormFlow:buttons.html.twig' %}
+            </form>
+        </div>
+    </div>
+{% endblock fos_user_content %}

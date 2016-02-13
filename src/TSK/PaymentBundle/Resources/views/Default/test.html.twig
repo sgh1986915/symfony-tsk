@@ -1,0 +1,23 @@
+{{ foo }}
+
+{% if results %}
+<table border="2" cellpadding="5">
+    <thead>Journal Entries</thead>
+    <tr>
+        <th>Debits</td>
+        <th>Credits</td>
+        <th>Transaction Effective Date</td>
+        <th>Posting Date</td>
+        <th>Entered On Date</td>
+    </tr>
+{% for r in results %}
+    <tr>
+        <td>{{r.debitAmount}} to {{r.debitAccount}}</td>
+        <td>{{r.creditAmount}} to {{r.creditAccount}}</td>
+        <td>{{r.date}}</td>
+        <td>{{r.date}}</td>
+        <td>{{today|date('Y-m-d')}}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endif %}

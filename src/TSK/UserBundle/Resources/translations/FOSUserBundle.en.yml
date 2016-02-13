@@ -1,0 +1,4 @@
+security:
+    login:
+        forgot_password: "Forgot Your Password?"
+        organization: "Organization:"

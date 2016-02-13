@@ -1,0 +1,35 @@
+{% extends "TSKStudentBundle::layout.html.twig" %}
+
+{% block head_script %}
+            <script type="text/javascript">
+                window.SONATA_CONFIG = {
+                    CONFIRM_EXIT: {% if admin_pool is defined and admin_pool.getOption('confirm_exit') %}true{% else %}false{% endif %}
+                };
+                window.SONATA_TRANSLATIONS = {
+                    CONFIRM_EXIT:  '{{ 'confirm_exit'|trans({}, 'SonataAdminBundle')|escape('js') }}'
+               };
+            </script>
+ 
+<script src="/bundles/sonatajquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-1.8.23.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-i18n.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block fos_user_content %}
+
+<h1>Confirm Contract Cancellation</h1>
+Are you sure you want to cancel this contract?
+
+<div class="well form-actions">
+<form method="POST">
+{{ form_widget(form.reason) }}
+{{ form_widget(form.reason_txt) }}
+<input type="submit" class="btn btn-danger" value="Cancel contract" />
+
+                                    or
+
+                    <a class="btn btn-success" href="#">Return to list</a>
+{{ form_rest(form) }}
+</form>
+</div>
+{% endblock %}

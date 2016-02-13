@@ -1,0 +1,51 @@
+{% block genemu_jqueryselect2_javascript %}
+
+    <script type="text/javascript">
+        function contactFormat(contact)
+        {
+            return contact.firstName + ' ' + contact.lastName;
+        }
+
+        $(document).ready(function() {
+        $field = $('#{{ id }}');
+
+
+        var $configs = {{ configs|json_encode|raw }};
+
+        // custom configs
+        $configs = $.extend($configs, {
+            minimumInputLength: 2,
+            dataType: 'jsonp',
+            ajax: {
+                url: "http://tsk.dev/app_dev.php/api/contact/by/name.json",
+                data: function (term, page) {
+                    return {
+                        query: term, // search term
+                        page_limit: 10,
+                    };
+                },
+                results: function (data, page) { 
+                    return { results: data };
+                }
+            },
+            initSelection: function(element, callback) {
+                var id=$(element).val();
+                if (id!=="") {
+                    $.ajax("http://tsk.dev/app_dev.php/api/contact/by/id.json", {
+                        data: {
+                            id: id
+                        },
+                        dataType: "jsonp"
+                    }).done(function(data) { callback(data); });
+                }
+            },
+            formatResult: contactFormat
+        });
+        // end of custom configs
+        console.log($configs);
+
+        $field.select2($configs);
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'SonataAdminBundle:CRUD:base_edit.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!--  // styling for rules -->
+    <style type="text/css">
+        .sonata-bc .row-fluid .conjunctionPicker {
+            width: 80%;
+        }
+        .sonata-collection-row .control-group .control-label {
+            width: 1px;
+            display: none;
+        }
+        .sonata-bc .form-horizontal td .controls {
+            margin-left: 10px;
+        }
+        .sonata-bc .form-horizontal .control-label {
+        }
+
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+    <script type="text/javascript">
+        // Your JS code here
+        function renderRankDropdown($elem, inputName, inputValue) {
+            // optional argument
+            inputValue = (typeof inputValue === "undefined") ? "" : inputValue;
+            $.get(Routing.generate('tsk_rank_default_dropdown', {rankId: inputValue}), function(data) {
+                mydata = data.replace("form[value]", inputName);
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        $(document).ready(function() {
+            $('.contextPicker').live('change', function() {
+                // var $closestTextarea = $(this).closest('tr').find('textarea');
+                // if ($closestTextarea) {
+                //     if (this.value == 'setEligibleRank') {
+                //         renderRankDropdown($closestTextarea, $closestTextarea.attr('name'), $closestTextarea.val());
+                //     }
+                // }
+            });
+
+            $('.factPicker').live('change', function() {
+                var $closestInput = $(this).closest('tr').find('input[type=text]');
+                var $closestSelect = $(this).closest('tr').find('select[name$="[value]"]');
+                if ($closestInput) {
+                    if (this.value == 1) {
+                        renderRankDropdown($closestInput, $closestInput.attr('name'), $closestInput.val());
+                    }
+                }
+                if ($closestSelect) {
+                    if (this.value != 1) {
+                        $closestSelect.replaceWith('<input type="text" name="' + $closestSelect.attr('name') + '" />');
+                    }
+                }
+            });
+            // For initial page loading
+            $('.factPicker').trigger('change');
+            $('.methodPicker').trigger('change');
+
+            $('div[id^="sonata-ba-field-container"][id$="rules"]').on('sonata.add_element', function(event) {
+                // redraw any rank selects as dropdowns
+                // insert here your code
+                $('.factPicker').each(function(idx, o) {
+                    if ($(o).val() == 1) {
+                        var $closestInput = $(this).closest('tr').find('input[type=text]');
+                        renderRankDropdown($closestInput, $closestInput.attr('name'), $closestInput.val());
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

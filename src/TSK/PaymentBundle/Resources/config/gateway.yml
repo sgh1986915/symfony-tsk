@@ -1,0 +1,14 @@
+parameters:
+    firstDataApiLogin: AD6830-05
+    firstDataApiKey: 03gdmtos
+    firstDataApiDebug: true
+
+services:
+    tsk_payment.gateway.e4_service:
+        class: VinceG\FirstDataApi\FirstData
+        arguments: [%firstDataApiLogin%, %firstDataApiKey%, %firstDataApiDebug%]
+
+    tsk_payment.gateway.service:
+        class: TSK\PaymentBundle\Gateway\E4PaymentGateway
+        arguments: [@tsk_payment.gateway.e4_service]
+

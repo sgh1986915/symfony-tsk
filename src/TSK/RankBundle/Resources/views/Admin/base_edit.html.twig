@@ -1,0 +1,27 @@
+{% extends 'SonataAdminBundle:CRUD:base_edit.html.twig' %}
+{% block javascripts %}
+    {{ parent() }}
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+    <script type="text/javascript">
+        // Your JS code here
+        $(document).ready(function() {
+            $('.factPicker').change(function() {
+                return true;
+                if (this.value == 1) {
+                    $.post('/app_dev.php/admin/tsk/rank/rankrule/foo', $('form').serialize(), function(data) {
+                        var oldValueName = $('.rankValue').attr('name');
+                        var formId = $('.tab-pane').attr('id').replace("_1", "");
+                        var parentDiv = $('#' + formId + '_value').parent('div');
+                        $('#' + formId + '_value').parent('div').html(data);
+                        $(parentDiv).children('select').attr('name', oldValueName);
+                        console.log(oldValueName);
+                    });
+                    return false;
+                }
+            });
+        });
+
+    </script>
+{% endblock %}

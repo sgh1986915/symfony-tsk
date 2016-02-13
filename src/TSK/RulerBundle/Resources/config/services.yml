@@ -1,0 +1,71 @@
+parameters:
+#    tsk_ruler.example.class: TSK\RulerBundle\Example
+    tsk_ruler.rewards_engine_chain.class: TSK\RulerBundle\Ruler\RewardsEngineChain
+
+services:
+#    tsk_ruler.example:
+#        class: %tsk_ruler.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
+    tsk_ruler.admin.rule_group:
+        class: TSK\RulerBundle\Admin\RuleGroupAdmin
+        arguments: [null, TSK\RulerBundle\Entity\RuleGroup, SonataAdminBundle:CRUD, @service_container]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Ruler", label: "Rule Groups" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', 'TSKRulerBundle:Admin:rule_group_edit.html.twig'] ]
+
+    tsk_ruler.admin.fact:
+        class: TSK\RulerBundle\Admin\FactAdmin
+        arguments: [null, TSK\RulerBundle\Entity\Fact, SonataAdminBundle:CRUD, @service_container]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Ruler", label: "Facts" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk_rank.admin.rank_extension] ]
+
+    tsk_ruler.admin.reward:
+        class: TSK\RulerBundle\Admin\RewardAdmin
+        arguments: [null, TSK\RulerBundle\Entity\Reward, SonataAdminBundle:CRUD, @service_container]
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Ruler", label: "Rewards" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk_ruler.admin.rule_context:
+        class: TSK\RulerBundle\Admin\RuleContextAdmin
+        arguments: [null, TSK\RulerBundle\Entity\RuleContext, SonataAdminBundle:CRUD, @service_container]
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Ruler", label: "RuleContext" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+
+    tsk_ruler.admin.rule_collection:
+        class: TSK\RulerBundle\Admin\RuleCollectionAdmin
+        arguments: [null, TSK\RulerBundle\Entity\RuleCollection, SonataAdminBundle:CRUD, @service_container]
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Ruler", label: "RuleCollection" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', 'TSKRulerBundle:Admin:rule_collection_edit.html.twig'] ]
+
+
+    tsk_ruler.rewards_engine_chain:
+        class: %tsk_ruler.rewards_engine_chain.class%
+
+
+    tsk_ruler.rule.form_type:
+        class: TSK\RulerBundle\Form\Type\RuleType
+        arguments: []
+        scope: prototype
+        tags:
+            - { name: form.type, alias: tsk_rule }
+
+    tsk_ruler.reward.form_type:
+        class: TSK\RulerBundle\Form\Type\RewardType
+        arguments: [@tsk_ruler.rewards_engine_chain]
+        scope: prototype
+        tags:
+            - { name: form.type, alias: tsk_reward }
+

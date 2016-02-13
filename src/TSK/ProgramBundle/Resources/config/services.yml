@@ -1,0 +1,56 @@
+parameters:
+    tsk_program.admin.edit_template: TSKProgramBundle:Admin:edit.html.twig
+services:
+    tsk.admin.program:
+        class: TSK\ProgramBundle\Admin\ProgramAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Programs" }
+        arguments: [null, TSK\ProgramBundle\Entity\Program, TSKProgramBundle:Program]
+        calls:
+            - [ addExtension, [@tsk.admin.program_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ getOrganization, [@session, %tsk_user.session.org_key%] ]
+            - [ setTemplate, ['edit', %tsk_program.admin.edit_template%] ]
+
+    tsk.admin.program_extension:
+        class: TSK\ProgramBundle\Admin\ProgramAdminExtension
+        arguments: [ @session, %tsk_user.session.org_key%, %tsk_user.session.school_key% ]
+
+    tsk_program.ruler.program_rewards_engine:
+        class: TSK\ProgramBundle\Ruler\ProgramReward
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: tsk_ruler.rewards_engine, alias: 'program' }
+
+    tsk_program.ruler.program_rules_engine:
+        class: TSK\ProgramBundle\Ruler\ProgramRulesEngine
+        arguments: [@doctrine.orm.entity_manager, @tsk_program.ruler.program_rewards_engine]
+        calls:
+            - [ setLogger, [@logger] ]
+
+    tsk.admin.membership_type:
+        class: TSK\ProgramBundle\Admin\MembershipTypeAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Membership Types" }
+        arguments: [null, TSK\ProgramBundle\Entity\MembershipType, SonataAdminBundle:CRUD]
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.program_type:
+        class: TSK\ProgramBundle\Admin\ProgramTypeAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Program Types" }
+        arguments: [null, TSK\ProgramBundle\Entity\ProgramType, SonataAdminBundle:CRUD]
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.program_payment_plan:
+        class: TSK\ProgramBundle\Admin\ProgramPaymentPlanAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Program Payment Plans" }
+        arguments: [null, TSK\ProgramBundle\Entity\ProgramPaymentPlan, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', %tsk_program.admin.edit_template%] ]

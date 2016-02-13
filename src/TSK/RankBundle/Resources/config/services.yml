@@ -1,0 +1,36 @@
+parameters:
+    tsk_rank.imports.rank_file: "%kernel.root_dir%/../src/TSK/RankBundle/Resources/files/REF_RANK.CSV"
+    tsk_rank.imports.fact_file: "%kernel.root_dir%/../src/TSK/RankBundle/Resources/files/facts.csv"
+
+services:
+    tsk_rank.admin.rank_extension:
+        class: TSK\RankBundle\Admin\RankAdminExtension
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.session.school_key%]
+        tags:
+            - { name: sonata.admin.extension }
+
+    tsk_rank.admin.rank:
+        class: TSK\RankBundle\Admin\RankAdmin
+        arguments: [null, TSK\RankBundle\Entity\Rank, SonataAdminBundle:CRUD, @service_container]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Rank", label: "Ranks" }
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk_rank.admin.rank_extension] ]
+            # - [ setTemplate, ['edit', 'TSKRankBundle:Admin:rank_edit.html.twig'] ]
+
+
+    tsk_rank.ruler.rank_rules_engine:
+        class: TSK\RankBundle\Ruler\RankRulesEngine
+        arguments: [@doctrine.orm.entity_manager, @tsk_rank.ruler.rank_rewards_engine]
+        calls:
+            - [ setLogger, [@logger] ]
+        
+
+    tsk_rank.ruler.rank_rewards_engine:
+        class: TSK\RankBundle\Ruler\RankReward
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: tsk_ruler.rewards_engine, alias: 'rank' }
+
+

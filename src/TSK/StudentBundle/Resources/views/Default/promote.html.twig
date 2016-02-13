@@ -1,0 +1,26 @@
+{% extends "TSKStudentBundle::layout.html.twig" %}
+
+{% block head_script %}
+
+<script src="/bundles/sonatajquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-1.8.23.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-i18n.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block fos_user_content %}
+
+    <h2>Promote Student
+    {{ student }}
+    </h2>
+
+{% if forms %}
+    {% for form in forms %}
+        <form method="post">
+            {{ form_widget(form) }}
+            <input type="submit" value="Promote {{ student }} to {{ form.rank.vars.data.getDescription }}" class="btn" />
+        </form>
+    {% endfor %}
+{% else %}
+    <b>No promotions available for student at this time ...</b>
+{% endif %}
+{% endblock %}

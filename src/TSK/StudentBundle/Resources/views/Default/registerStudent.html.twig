@@ -1,0 +1,261 @@
+{% extends "TSKStudentBundle::layout.html.twig" %}
+
+{% set _rs = form.vars.value %}
+
+{% block head_script %}
+<link rel="stylesheet" href="/bundles/sonataadmin/bootstrap/css/bootstrap.min.css" type="text/css" media="all"  />
+            <link rel="stylesheet" href="/bundles/sonataadmin/bootstrap/css/bootstrap-responsive.min.css" type="text/css" media="all" />
+<link rel="stylesheet" href="/bundles/sonatajquery/themes/flick/jquery-ui-1.8.16.custom.css" type="text/css" media="all" />
+<style type="text/css">
+li.craue_formflow_current_step {
+    font-weight: bold;
+}
+label.recurs, input.recurs, div.recurs {
+    display: none;
+}
+</style>
+
+            <script type="text/javascript">
+                window.SONATA_CONFIG = {
+                    CONFIRM_EXIT: {% if admin_pool is defined and admin_pool.getOption('confirm_exit') %}true{% else %}false{% endif %}
+                };
+                window.SONATA_TRANSLATIONS = {
+                    CONFIRM_EXIT:  '{{ 'confirm_exit'|trans({}, 'SonataAdminBundle')|escape('js') }}'
+               };
+            </script>
+ 
+<script src="/bundles/sonatajquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-1.8.23.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-i18n.js" type="text/javascript"></script>
+<script src="/bundles/malaney/PaymentCalculator/src/PaymentCalculator.js" type="text/javascript"></script>
+<script src="/bundles/janl/mustache.js/mustache.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/base.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/jquery/jquery.form.js" type="text/javascript"></script>
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+{% if _rs.getStudentContact.getId is defined %}
+    $('input.copyStudentToBillee').change(function() {
+        if (this.checked) {
+            $.get('{{ path('get_contact', {'contact': _rs.getStudentContact.getId, '_format': 'json'})}}', function(data) {
+                $('.createDlg input[name*=email]').val(data.email);
+                $('.createDlg input[name*=address1]').val(data.address1);
+                $('.createDlg input[name*=address2]').val(data.address2);
+                $('.createDlg input[name*=city]').val(data.city);
+                $('.createDlg select[name*=state]').val(data.state);
+                $('.createDlg input[name*=postalCode]').val(data.postalCode);
+                $('.createDlg input[name*=phone]').val(data.phone);
+                $('a.createPopup').click();
+            });
+        }
+    });
+
+    $('input.copyStudentToEmergency').change(function() {
+        if (this.checked) {
+            $.get('{{ path('get_contact', {'contact': _rs.getStudentContact.getId, '_format': 'json'})}}', function(data) {
+                $('.createDlg input[name*=email]').val(data.email);
+                $('.createDlg input[name*=address1]').val(data.address1);
+                $('.createDlg input[name*=address2]').val(data.address2);
+                $('.createDlg input[name*=city]').val(data.city);
+                $('.createDlg select[name*=state]').val(data.state);
+                $('.createDlg input[name*=postalCode]').val(data.postalCode);
+                $('.createDlg input[name*=phone]').val(data.phone);
+                $('a.createPopup').click();
+            });
+        }
+    });
+{% endif %}
+
+    // This is really only used for initial load
+    $('#registerStudent_paymentPlanCustomizedPayments_paymentsData').change(function() {
+        try {
+            obj = JSON.parse(this.value);
+            $('div.paycal_txt a').html(obj.summary);
+        } catch (err) {
+            // alert(err);
+        }
+    });
+
+            $('div.paycal_txt a').click(function(e) {
+                // load payment
+                obj = JSON.parse($('#registerStudent_paymentPlanCustomizedPayments_paymentsData').val());
+                var url = '{{path('tsk_payment_default_cust')}}';
+                var d = openInDialog(this, url, {'paymentsData': obj});
+                e.preventDefault();
+                return false;
+            });
+
+
+    $('#registerStudent_programPaymentPlan').change(function() {
+        if (this.value) {
+            // populate paymentPlan with json data
+            $.get(Routing.generate('tsk_payment_default_plan', { program_payment_plan_id: this.value }), function(data) {
+                var paymentsData = JSON.parse(data.paymentsData);
+                $('div.paycal_txt a').html(paymentsData.summary);
+                $('#registerStudent_paymentPlanCustomizedPayments_paymentsData').val(data.paymentsData);
+            });
+        }
+    });
+
+    $dialog = $('<div></div>').dialog({
+        autoOpen: false,
+        width: 580,
+        modal: true,
+        show: 'fade',
+        hide: 'fade'
+    });
+
+    function openInDialog(element, target, data) 
+    {
+        var $url = target;
+        var $title = "Customize Payment Calculator"; 
+        $dialog.empty();
+        $dialog.dialog("option", "title", $title);
+
+        // $.data(element, 'summary_div', $('.paycal_txt a'));
+        if (data) {
+            $dialog.load($url, data, function() {
+                $dialog.data('summary_div', $('div.paycal_txt a')).data('textarea', $('#registerStudent_paymentPlanCustomizedPayments_paymentsData')).dialog('open');
+            });
+        } else {
+            $dialog.load($url, function() {
+                $dialog.dialog('open');
+            });
+        }
+        return $dialog;
+    }
+
+    $('#btnCustomize').click(function(e) {
+        if ($('#registerStudent_programPaymentPlan').val()) {
+            var url = '{{path('tsk_payment_default_calc')}}/' + $('#registerStudent_programPaymentPlan').val();
+            var d = openInDialog(this, url);
+        } else {
+            alert('Please select a payment plan to customize');
+        }
+        e.preventDefault();
+        return false;
+    });
+    $('#registerStudent_paymentPlanCustomizedPayments_paymentsData').trigger('change');
+
+
+    $('#registerStudent_paymentMethod').change(function() {
+        hideRecurs();
+        if ($(this).val()) {
+            if (this.options[this.selectedIndex].text == 'ACH') {
+                showRecurs('ach');
+                clearRecurs('credit');
+            } else {
+                showRecurs('credit');
+                clearRecurs('ach');
+            }
+        } else {
+            // console.log('nada on bpm');
+        }
+    });
+    $('#registerStudent_paymentMethod').trigger('change');
+});
+
+    // Hide
+    function hideRecurs()
+    {
+        $('.recurs').hide();
+        $('.recurs').parents('div.control-group').children('label').hide();
+    }
+
+    // Show
+    function showRecurs(type)
+    {
+        if (typeof type != 'undefined') {
+            $('.' + type).each(function(i, obj) {
+                $(obj).show();
+                $(obj).parents('div.control-group').children('label').show();
+            });
+        }
+    }
+
+    function clearRecurs(type)
+    {
+         if (typeof type != 'undefined') {
+            $('.' + type).val('');
+        }
+    }
+
+</script>
+{% endblock head_script %}
+{% block fos_user_content %}
+<div>
+    Steps:
+    {% include 'CraueFormFlowBundle:FormFlow:stepList.html.twig' %}
+</div>
+<form method="post" {{ form_enctype(form) }}>
+    {% include 'CraueFormFlowBundle:FormFlow:stepField.html.twig' %}
+
+    {{ form_errors(form) }}
+
+    {% if flow.getCurrentStep() == 9 %}
+        <div>
+            You have to agree to the terms of service to register.<br />
+            {# set _rs = form.vars.value #}
+            <h3>Program</h3>
+            {{ _rs.getProgram }}
+
+            {% if _rs.getContractBalanceDays %}
+            <h3>Existing Contract Details</h3>
+                <p>
+                <b>Contract Start Date</b>: {{ _rs.getContract.getCreatedDate | date('Y-m-d') }}<br/>
+                <b>Contract Expire Date</b>: {{ _rs.getContract.getContractExpiry | date('Y-m-d') }}<br/>
+                <b>Contract Amount Paid</b>: {{ _rs.getContract.getAmountPaid }} Dollars<br/>
+                <b>Contract Percentage Consumed</b>: {{ _rs.getContract.getPercentageTimeConsumed }}<br/>
+                <b>Contract Amount Consumed</b>: {{ _rs.getContract.getDollarsConsumed }} Dollars<br/>
+                <b>Contract Amount Owed</b>: {{ _rs.getContract.getDollarsOwed }} Dollars<br/>
+                <b>Contract Total Days</b>: {{ _rs.getContract.getTotalDays }} Days<br/>
+                <b>Contract Balance Days</b>: {{ _rs.getContractBalanceDays }} Days<br/>
+                <b>Contract Balance Money</b>: {{ _rs.getContract.getTrueBalanceInDollars }} Dollars<br/>
+                </p>
+            {% endif %}
+
+            <h3>School</h3>
+            
+            {% set _corp = _rs.getSchool.getContact.getCorporations.first %}
+            {{ _corp.getLegalName }}<br/>
+            {{_rs.getSchool.getContact.getAddress1 }}<br/>
+            {% if _rs.getSchool.getContact.getAddress2 %}
+            {{_rs.getSchool.getContact.getAddress2 }}
+            {% endif %}
+            {{_rs.getSchool.getContact.getCity }}, {{_rs.getSchool.getContact.getState.getId }}
+            {{_rs.getSchool.getContact.getPostalCode }}
+
+            <h3>Payment Plan</h3>
+            {% if _rs.getCcNum %}
+            CC Num: {{ _rs.getCcNum|mask_credit_card }}
+            {% endif %}
+            {% if _rs.getRoutingNumber %}
+            <br/>Routing num: {{ _rs.getRoutingNumber }}
+            {% endif %}
+            <br/>
+            {% for key in _rs.getPaymentPlanCustomizedPayments %}
+                {{get_payment_calculator_data(key, 'summary')}}<br/>
+            {% endfor %}
+            <h3>Student Info</h3>
+            {{ _rs.getStudentContact.getFirstName }} {{ _rs.getStudentContact.getLastName }}<br/>
+            {{ _rs.getStudentContact.getAddress1 }}<br/>
+            {% if _rs.getStudentContact.getAddress2 %}{{ _rs.getStudentContact.getAddress2 }}<br/>{% endif %}
+            {{ _rs.getStudentContact.getCity }}, {{ _rs.getStudentContact.getState }}  {{ _rs.getStudentContact.getPostalCode }}<br/>
+            {{_rs.getStudentContact.getPhone }}
+ 
+            <h3>Billee Info</h3>
+            {{ _rs.getBilleeContact.getFirstName }} {{ _rs.getBilleeContact.getLastName }}<br/>
+            {{ _rs.getBilleeContact.getAddress1 }}<br/>
+            {% if _rs.getBilleeContact.getAddress2 %}{{ _rs.getBilleeContact.getAddress2 }}<br/>{% endif %}
+            {{ _rs.getBilleeContact.getCity }}, {{ _rs.getBilleeContact.getState }}  {{ _rs.getBilleeContact.getPostalCode }}<br/>
+            {{_rs.getBilleeContact.getPhone }}
+    
+        </div>
+    {% endif %}
+
+    {{ form_rest(form) }}
+
+    {% include 'TSKStudentBundle:FormFlow:buttons.html.twig' %}
+</form>
+{% endblock fos_user_content %}

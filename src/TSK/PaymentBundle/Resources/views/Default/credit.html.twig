@@ -1,0 +1,360 @@
+{% extends 'TSKUserBundle::layout.html.twig' %}
+
+{% block foot_script %}
+<!-- howdy -->
+    {# To only use a subset or add more js overwrite and copy paste this block
+    To speed up page loads save a copy of jQuery in your project and override this block to include the correct path
+    Otherwise the regeneration is done on every load in dev more with use_controller: true
+     #}
+     
+    {% javascripts
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-transition.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-alert.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-modal.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-dropdown.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-scrollspy.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-tab.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-tooltip.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-popover.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-button.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-collapse.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-carousel.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-typeahead.js'
+        '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
+        '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
+        '@MopaBootstrapBundle/Resources/public/js/eyecon-bootstrap-datepicker.js'
+    %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+
+
+{% endblock foot_script %}
+{% block head_script %}
+
+            <script type="text/javascript">
+                window.SONATA_CONFIG = {
+                    CONFIRM_EXIT: {% if admin_pool is defined and admin_pool.getOption('confirm_exit') %}true{% else %}false{% endif %}
+                };
+                window.SONATA_TRANSLATIONS = {
+                    CONFIRM_EXIT:  '{{ 'confirm_exit'|trans({}, 'SonataAdminBundle')|escape('js') }}'
+               };
+            </script>
+
+<script src="/bundles/sonatajquery/jquery-1.8.3.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-1.8.23.js" type="text/javascript"></script>
+<script src="/bundles/sonatajquery/jquery-ui-i18n.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/x-editable/js/bootstrap-editable.min.js"></script>
+
+<script src="/bundles/sonataadmin/base.js" type="text/javascript"></script>
+<script src="/bundles/sonataadmin/jquery/jquery.form.js" type="text/javascript"></script>
+<script src="/bundles/adamwdraper/Numeral-js/numeral.js" type="text/javascript"></script>
+
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+<link rel="stylesheet" href="/bundles/sonatajquery/themes/flick/jquery-ui-1.8.16.custom.css" type="text/css" media="all" />
+<script type="text/javascript">
+$(document).ready(function() {
+    var collectionHolder = $('div.checkboxen');
+    collectionHolder.data('index', collectionHolder.find(':input').length);
+
+    $('#tsk_receive_payment_contact').change(function() {
+        if (this.value) {
+            $.post(Routing.generate('tsk_payment_default_getopencharges', {}), $('form').serialize(), function(data) {
+                $('#transactions').empty();
+                $('#transactions').append(data);
+
+                // Calculate openChargesTotal
+                var openChargeTotal = 0;
+                $('input.cpayments').each(function(i, obj) {
+                   openChargeTotal += parseFloat($(obj).attr('data-amount')); 
+                });
+                $('#openChargeTotal').empty().append(openChargeTotal);
+
+                $('div.charge_row input[type="checkbox"]').on('click', function() {
+                    // Get closest payment input ...
+                    var myPmt = $(this).closest('div.charge_row').find('input.cpayments'); 
+                    var amt = myPmt.attr('data-amount');
+                    if (this.checked) {
+                        // apply payment
+                        //  - sum applied payments
+                        var currentApplied = sumAppliedPayments('input.cpayments');
+                        //  - subtract from paymentAmount
+                        var balance = parseFloat($('#tsk_receive_payment_paymentAmount').val()) || 0;
+                        balance = balance - currentApplied;
+                        //  - apply the min of chargeTotal or balance to payment input
+                        $(myPmt).val(Math.min(balance, amt));
+                    } else {
+                        // retract payment
+                        $(this).closest('div.charge_row').find('input.cpayments').val('');
+                    }
+
+                    $('#appliedPaymentsTotal').empty().append(sumAppliedPayments('input.cpayments'));
+                });
+
+                $('#clear').click(function(e) {
+                    e.preventDefault();
+                    clearPayments('input.cpayments');
+                    // update totals
+                    updateTotals('#appliedPaymentsTotal');
+                    return false;
+                });
+                $('#auto_apply').click(function(e) {
+                    e.preventDefault();
+                    $('#tsk_receive_payment_paymentAmount').trigger('change');
+                    return false;
+                });
+
+            });
+            return false;
+        }
+    });
+
+    $('input[name*="DistributionStrategy"]').click(function() {
+        clearPayments('input.cpayments');
+        $('#tsk_receive_payment_paymentAmount').trigger('change');
+    });
+
+    // Auto-apply payments to open charges
+    $('#tsk_receive_payment_paymentAmount').change(function() {
+        clearPayments('input.cpayments');
+        if (parseFloat(this.value)) {
+            var balance = numeral(this.value);
+            if ($('input[name*="DistributionStrategy"]:checked').val() == 'eagerly') {
+                $('input.cpayments').each(function(i, obj) {
+                    var chargeTotal = $(obj).attr('data-amount');
+                    diff = Math.min(chargeTotal, balance);
+                    // subtract diff from balance
+                    balance.subtract(diff);
+                    // put diff in payment value
+                    $(obj).val(diff ? diff : '');
+                    // check closest checkbox
+                    $(obj).closest('div.charge_row').find('input[type="checkbox"]').prop('checked', diff);
+                });
+            } else if ($('input[name*="DistributionStrategy"]:checked').val() == 'evenly') {
+                // Need to use check for 0.001 due to javascript precision error
+                while (balance.format('0.00') > 0.001) {
+                    $('input.cpayments').each(function(i, obj) {
+                        currVal = numeral($(obj).val());
+                        if ((balance.format('0.00') > 0.001) && (currVal < $(obj).attr('data-amount'))) {
+                            currVal.add(0.01);
+                            $(obj).val(currVal.format('0.00'));
+                            $(obj).closest('div.charge_row').find('input[type="checkbox"]').prop('checked', true);
+                            balance.subtract(0.01);
+                        }
+                    });
+                }
+            }
+        }
+        updateTotals('#appliedPaymentsTotal');
+    });
+
+    $('#tsk_receive_payment_paymentMethod').change(function() {
+        if (this.value) {
+            $.post(Routing.generate('tsk_payment_default_getpaymentmethodui', {}), $('form').serialize(), function(data) {
+                $('#pmui').empty();
+                $('#pmui').append(data);
+            });
+            return false;
+        }
+    });
+});
+
+function updateTotals(selector)
+{
+    var totalAppliedPayments = sumAppliedPayments('input.cpayments');
+    var paymentAmount = $('#tsk_receive_payment_paymentAmount').val();
+    // If we enter an amount more than payment applied, then adjust amount
+    // to be payment applied, to prevent dealing with credit.
+    // USERS MAY NOT PAY MORE MONEY THAN THEY CAN APPLY TO CHARGES
+    if (paymentAmount > totalAppliedPayments) {
+        $('#tsk_receive_payment_paymentAmount').val(totalAppliedPayments);
+    }
+    $(selector).empty().append(totalAppliedPayments);
+}
+
+function sumAppliedPayments(selector)
+{
+    var appliedPayments = numeral(0);
+    $(selector).each(function(i, obj) {
+        if (typeof $(obj).val() == 'string') {
+            if ($(obj).closest('div.charge_row').find('input[type="checkbox"]').prop('checked')) {
+                appliedPayments.add($(obj).val());
+                // appliedPayments += isNaN(parseFloat($(obj).val())) ? 0 : parseFloat($(obj).val());
+            }
+        }
+    });
+    return appliedPayments.format('0.00');
+}
+
+function clearPayments(selector)
+{
+    $(selector).each(function(i, obj) {
+        $(obj).val('');
+        $(obj).closest('div.charge_row').find('input[type="checkbox"]').prop('checked', false);
+    });
+}
+
+</script>
+<style type="text/css">
+.ccstuff {
+    display: none;
+}
+#contact {
+    width: 400px;
+}
+#pmt_details {
+    width: 300px;
+    padding-left: 80px;
+    float: right;
+}
+#memo {
+    border: 1px solid black;
+}
+#holder {
+    overflow: auto;
+}
+span.error {
+    color: #c00;
+}
+input.cpayments {
+    text-align: right;
+}
+
+div.charge_row.header > div {
+    background-color: #ccc;
+    font-size: 12px;
+    font-family: Arial, Lucida, sans-serif;
+}
+div.total_row {
+    width: 800px;
+    overflow: auto;
+}
+div.total_row > div {
+    height: 40px;
+    font-size: 12px;
+    font-family: Arial, Lucida, sans-serif;
+    float: left;
+    padding: 3px;
+}
+div.total_row > div:nth-child(1) {
+    width: 440px;
+    text-align: left;
+}
+div.total_row > div:nth-child(2) {
+    width: 87px;
+    text-align: right;
+}
+div.total_row > div:nth-child(3) {
+    width: 81px;
+    text-align: right;
+}
+div.total_row > div:nth-child(4) {
+    width: 165px;
+    text-align: right;
+}
+
+div.charge_row {
+    width: 800px;
+    overflow: auto;
+}
+div.charge_row > div {
+    height: 40px;
+    font-size: 12px;
+    font-family: Arial, Lucida, sans-serif;
+    float: left;
+    padding: 3px;
+}
+div.charge_row > div:nth-child(1) {
+    width: 60px;
+}
+div.charge_row > div:nth-child(2) {
+    width: 234px;
+}
+div.charge_row > div:nth-child(3) {
+    width: 110px;
+    text-align: right;
+}
+div.charge_row > div:nth-child(3) {
+    width: 100px;
+    text-align: right;
+}
+div.charge_row > div:nth-child(4) {
+    width: 120px;
+    text-align: right;
+}
+div.charge_row > div:nth-child(5) {
+    width: 80px;
+    text-align: right;
+}
+div.charge_row.header > div:nth-child(6) {
+}
+div.charge_row > div:nth-child(6) {
+    text-align: right;
+    width: 170px;
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+        {% for key, message in app.session.flashbag.all() %}
+        <div class="{{ key }}">
+            {{ message|trans({}, 'FOSUserBundle') }}
+        </div>
+        {% endfor %}
+
+
+{% block fos_user_content %}
+
+
+{{ form_errors(form) }}
+<form method="post" action="{{ path('credit_save') }}">
+<div style="border: 1px solid black; width: 800px;">
+    <div id="holder">
+        <div id="pmt_details">
+            {{ form_row(form.paymentType) }}
+            {% if form.paymentDate is defined %}
+            {{ form_label(form.paymentDate) }}
+            <span class="error">{{ form_errors(form.paymentDate) }}</span>
+            {{ form_widget(form.paymentDate) }}
+<br/>
+            {% endif %}
+            {{ form_label(form.paymentAmount) }}
+            <span class="error">{{ form_errors(form.paymentAmount) }}</span>
+            {{ form_widget(form.paymentAmount) }}
+
+            {{ form_widget(form.paymentDistributionStrategy) }}
+<br/>
+            {{ form_label(form.paymentMethod) }}
+            <span class="error">{{ form_errors(form.paymentMethod) }}</span>
+            {{ form_widget(form.paymentMethod) }}
+            <div id="pmui">
+            </div>
+        </div>
+        <h3>Apply Credit</h3>
+        <div id="contact">
+            {{ form_label(form.contact) }}
+            <span class="error">{{ form_errors(form.contact) }}</span>
+            {{ form_widget(form.contact) }}
+        </div>
+    </div>
+    <div id="memo">
+            {{ form_label(form.memo) }}
+            <span class="error">{{ form_errors(form.memo) }}</span>
+            {{ form_widget(form.memo) }}
+    </div>
+</div>
+
+{{ form_rest(form) }}
+<div id="transactions" style="border: 1px solid black; width: 800px;">
+</div>
+{{ form_rest(form) }}
+    <p>
+            <button type="submit">Save</button>
+    </p>
+</form>
+{% endblock fos_user_content %}
+
+{% endblock content %}

@@ -1,0 +1,21 @@
+{% extends 'SonataAdminBundle:Form:form_admin_fields.html.twig' %}
+
+{% block collection_widget %}
+{% spaceless %}
+    {% if prototype is defined %}
+        {% set child = prototype %}
+        {% set attr = attr|merge({'data-prototype': block('collection_widget_row'), 'data-prototype-name': prototype.vars.name, 'class': attr.class|default('') ~ ' controls' }) %}
+    {% endif %}
+    <div {{ block('widget_container_attributes') }}>
+        {{ form_errors(form) }}
+        {% for child in form %}
+            {{ block('collection_widget_row') }}
+        {% endfor %}
+        {{ form_rest(form) }}
+        {% if allow_add %}
+            <div><a href="#" class="btn sonata-collection-add"><i class="icon-plus"></i></a></div>
+        {% endif %}
+    </div>
+{% endspaceless %}
+{% endblock collection_widget %}
+

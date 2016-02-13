@@ -1,0 +1,52 @@
+{% extends "TSKStudentBundle::layout.html.twig" %}
+{% block fos_user_content %}
+    <h2>Contract Preview</h2>
+    <table class="table">
+        <tr>
+            <th class="span2 pull-right">Student(s)</th>
+            <td>
+                {% for student in contract.getStudents %}
+                    <a href="{{ path('admin_tsk_student_student_edit', {id: student.getId })}}">{{ student }}</a>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <th>School</th>
+            <td><a href="{{ path('admin_tsk_school_school_edit', {id: contract.getSchool.getId })}}">{{ contract.getSchool }}</a></td>
+        </tr>
+        <tr>
+            <th>Program</th>
+            <td>
+                <a href="{{ path('admin_tsk_program_program_edit', {id: contract.getProgram.getId })}}">{{ contract.getProgram.getProgramName }}</a> ({{ contract.getProgram.getMembershipType.getName}})
+            <br/><br/>
+            <form method="post" class="form-inline">
+                {{ form_widget(form.program) }}
+                {{ form_rest(form) }}
+                <input type="submit" value="upgrade" class="btn" />
+            </form>
+            </td>
+        </tr>
+        <tr>
+            <th>Start Date</th><td>{{ contract.getContractStartDate|date('Y-m-d') }}</td>
+        </tr>
+        <tr>
+            <th>End Date</th><td>{{ contract.getContractExpiry|date('Y-m-d') }}</td>
+        </tr>
+        <tr>
+            <th>Active</th><td>{% if contract.getIsActive %}yes{% else %}no{% endif %}</td>
+        </tr>
+        <tr>
+            <th>Total</th><td>{{ get_payment_calculator_data(contract.getPaymentTerms['paymentsData'], 'principal') }}</td>
+        </tr>
+        <tr>
+            <th>Amount Paid</th><td>{{ contract.getAmountPaid }}</td>
+        </tr>
+        <tr>
+            <th>Balance</th>
+            <td>
+                Days Remaining: {{ contract.getBalanceInDays() }}<br/>
+                Dollars Remaining: {{ contract.getBalanceInDollars() }}<br/>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

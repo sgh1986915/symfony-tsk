@@ -1,0 +1,107 @@
+services:
+    tsk_schedule.calendar_listener:
+        class: TSK\ScheduleBundle\EventListener\CalendarEventListener
+        arguments: [@doctrine.orm.entity_manager, @security.context]
+        tags:
+            - { name: kernel.event_listener, event: calendar.load_events, method: loadEvents }
+
+    tsk.admin.schedule_location:
+        class: TSK\ScheduleBundle\Admin\ScheduleLocationAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Schedules", label: "Locations" }
+        arguments: [null, TSK\ScheduleBundle\Entity\ScheduleLocation, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.schedule_category:
+        class: TSK\ScheduleBundle\Admin\ScheduleCategoryAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Schedules", label: "Categories" }
+        arguments: [null, TSK\ScheduleBundle\Entity\ScheduleCategory, SonataAdminBundle:CRUD, @service_container]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', 'TSKScheduleBundle:CRUD:edit.html.twig'] ]
+
+    tsk.admin.schedule_entity:
+        class: TSK\ScheduleBundle\Admin\ScheduleEntityAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Schedules", label: "Entities" }
+        arguments: [null, TSK\ScheduleBundle\Entity\ScheduleEntity, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', 'TSKScheduleBundle:CRUD:edit.html.twig'] ]
+            - [ setTemplate, ['list', 'TSKScheduleBundle:CRUD:list.html.twig'] ]
+
+    tsk_schedule.schedule_entity.listener.pre_persist:
+        class: TSK\ScheduleBundle\EventListener\ScheduleEntityListener
+        arguments: [ @service_container ]
+        tags:
+         - { name: doctrine.event_listener, event: prePersist, method: prePersist }
+    tsk_schedule.schedule_entity.listener.pre_update:
+        class: TSK\ScheduleBundle\EventListener\ScheduleEntityListener
+        arguments: [ @service_container ]
+        tags:
+         - { name: doctrine.event_listener, event: preUpdate, method: preUpdate }
+
+    tsk_schedule.schedule_entity.listener.post_persist:
+        class: TSK\ScheduleBundle\EventListener\ScheduleEntityListener
+        arguments: [ @service_container ]
+        tags:
+         - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+
+    tsk_schedule.schedule_entity.listener.post_update:
+        class: TSK\ScheduleBundle\EventListener\ScheduleEntityListener
+        arguments: [ @service_container ]
+        tags:
+         - { name: doctrine.event_listener, event: postUpdate, method: postUpdate }
+
+
+    tsk_schedule.schedule_attendance.listener.post_persist:
+        class: TSK\ScheduleBundle\EventListener\ScheduleAttendanceListener
+        arguments: [@event_dispatcher]
+        tags:
+         - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+
+    tsk_schedule.schedule_attendance.listener.post_update:
+        class: TSK\ScheduleBundle\EventListener\ScheduleAttendanceListener
+        arguments: [@event_dispatcher]
+        tags:
+         - { name: doctrine.event_listener, event: postUpdate, method: postUpdate }
+
+    tsk_schedule.schedule_attendance.listener.post_remove:
+        class: TSK\ScheduleBundle\EventListener\ScheduleAttendanceListener
+        arguments: [@event_dispatcher]
+        tags:
+         - { name: doctrine.event_listener, event: postRemove, method: postRemove }
+
+    tsk_schedule.form.type.schedule_options_type:
+        class: TSK\ScheduleBundle\Form\Type\ScheduleOptionsType
+        tags: 
+            - { name: form.type, alias: tsk_schedule_options }
+
+    tsk_schedule.form.type.date_picker_type:
+        class: TSK\ScheduleBundle\Form\Type\DatePickerType
+        tags:
+            - { name: form.type, alias: datePicker }
+
+    tsk_schedule.form.type.date_time_picker_type:
+        class: TSK\ScheduleBundle\Form\Type\DateTimePickerType
+        tags:
+            - { name: form.type, alias: dateTimePicker }
+
+    tsk_schedule.form.type.attendance_form_type:
+        class: TSK\ScheduleBundle\Form\Type\AttendanceFormType
+        tags:
+            - { name: form.type, alias: tsk_schedule_attendance_type }
+
+    tsk_schedule.processor.schedule_instances:
+        class: TSK\ScheduleBundle\Processor\ScheduleInstances
+        arguments: [@doctrine.orm.entity_manager]
+
+    tsk_schedule.form.type.roster_form_type:
+        class: TSK\ScheduleBundle\Form\Type\RosterFormType
+        arguments: [@tsk.admin.contact, 'tsk.admin.contact']
+        tags:
+            - { name: form.type, alias: tsk_schedule_roster_type }
+        scope: prototype
+

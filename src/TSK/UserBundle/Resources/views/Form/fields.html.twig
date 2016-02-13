@@ -1,0 +1,63 @@
+{% block tsk_organization_form_type_widget %}
+    {% spaceless %}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block tsk_contact_list_widget %}
+<div>
+    {% spaceless %}
+    <span id="modelName" class="field-short-description">
+    {% if object is defined %}
+        <b>{{ object|escape }}</b>&nbsp;
+    {% endif %}
+    </span>
+
+    {% if object is defined %}
+{% if show_edit %}
+<a class="editPopup" href="{{ admin.generateUrl('edit', {'id': object.getId, 'uniqid': uniqid, 'code': '{{ admin_name }}' }) }}">{{ edit_label }}</a> &bull; 
+{% endif %}
+
+    </span>
+    {% endif %}
+
+    <span style="display: none">{{ form_widget(form) }}</span>
+    {{ form_errors(form) }}
+
+
+
+    <a class="listPopup"  href="{{ admin.generateUrl('list', {'uniqid': uniqid, 'code': '{{ admin_name }}' }) }}">{{ list_label }}</a> 
+{% if show_add %}
+&bull; <a class="createPopup" href="{{ admin.generateUrl('create', {'uniqid': uniqid, 'code': '{{ admin_name }}' }) }}">{{ add_label }}</a>
+{% endif %}
+
+          <div class="listDlg container sonata-ba-modal sonata-ba-modal-edit-one-to-one" style="display: none"></div>
+          <div class="createDlg container sonata-ba-modal sonata-ba-modal-edit-one-to-one" style="display: none"></div>
+          <div class="editDlg container sonata-ba-modal sonata-ba-modal-edit-one-to-one" style="display: none"></div>
+    {% endspaceless %}
+</div>
+
+{% include 'TSKUserBundle:Form:helper_script.html.twig' %}
+{% endblock %}
+
+{% block tsk_permbits_widget %}
+    {% for child in form %}
+        <div class="permbit">
+        {{ form_row(child) }}
+        </div>
+    {% endfor %}
+        <div class="permbit">
+<button type="submit">save</button>
+        </div
+{% endblock %}
+
+{% block tsk_permission_type_widget %}
+    {{ form_row(form.className) }}
+    {{ form_row(form.classType) }}
+    {{ form_row(form.fieldName) }}
+    {{ form_widget(form.bits) }}
+
+    {{ form_rest(form) }}
+{% endblock %}

@@ -1,0 +1,98 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="src/PaymentCalculator.js"></script>
+    <script type="text/javascript" src="src/mustache.js"></script>
+    <script type="text/javascript">
+$(document).ready(function() {
+    $('#btnGenPayments').click(function() {
+        // Build initialPayments array
+        initialPayments = [];
+        $('.ovr').each(function(idx) {
+            ip =  ($(this).is(':checked')) ? $('.pmt').get(idx).value : 0;
+            initialPayments.push(ip);
+        });
+
+        // Empty payments div
+        $('#payments').empty();
+
+        try {
+            // compute payments
+            paymentCalculator = new PaymentCalculator({'principal': $('#principal').val(), 'numPayments': $('#num_payments').val(), 'paymentGravity': $('#payment_gravity').val(), 'roundingPrecision': $('#rounding_precision').val(), 'initialPayments': initialPayments});
+            payments = paymentCalculator.generatePayments();
+       
+            for (i=0; i < payments.length; i++) {
+                var output = Mustache.render($('#paymentWidget').html(), {'idx': i+1, 'payment': payments[i], 'ip': initialPayments[i]});
+                $('#payments').append(output);
+            }
+
+            $('#payments').append('<p><b>Total</b> ' + paymentCalculator.sumPayments() + '</p>');
+        } catch (err) {
+            alert(err);
+        }
+    
+        // if the value typed into input is a number
+        // we auto-check the override checkbox, otherwise
+        // we auto-uncheck it
+        $('.pmt').on('keyup', function() {
+            if (this.value) {
+                $($(this).siblings('input.ovr').get(0)).prop('checked', !isNaN(parseFloat(this.value)) && isFinite(this.value));
+            }
+        });
+        return false;
+    });
+
+    $('#rounding_precision, #payment_gravity').change(function() {
+        $('#btnGenPayments').click();
+    });
+    $('#principal, #num_payments').blur(function() {
+        $('#btnGenPayments').click();
+    });
+    $('#btnClear').click(function() {
+        // Empty payments div
+        $('#payments').empty();
+        return false;
+    });
+});
+    </script>
+</head>
+<h2>Payment Calculator</h2>
+<form>
+<blockquote>
+    <legend></legend>
+    <label for="principal">Principal</label>
+    <input type="text" placeholder="principal" name="principal" id="principal" value="1000" />
+    <br/>
+    <label for="num_payments">Num Payments</label>
+    <input type="text" placeholder="num_payments" name="num_payments" id="num_payments" value="5" />
+    <br/>
+    <label for="payment_gravity">Payment Gravity (Largest Payments Toward ...)</label>
+    <select name="payment_gravity" id="payment_gravity">
+        <option value="top">top</option>
+        <option value="bottom">bottom</option>
+    </select>
+    <br/>
+    <label for="rounding_precision">Rounding Precision</label>
+    <select name="rounding_precision" id="rounding_precision">
+        <option value="0.01">0.01</option>
+        <option value="0.10">0.10</option>
+        <option value="1" selected>1</option>
+        <option value="10">10</option>
+    </select>
+    <br/>
+
+    <button name="btn" id="btnGenPayments" value"generatePayments">Generate Payments</button>
+    <button name="btn" id="btnClear" value"generatePayments">Clear</button>
+<blockquote>
+
+    <div id="payments"></div>
+</form>
+
+<script type="text/template" id="paymentWidget">
+    <p>
+        Payment {{idx}}
+        <input type='checkbox' name="override[]" {{#ip}}checked{{/ip}} class="ovr" />
+        <input type="text" name="payment[]" class="pmt" value="{{payment}}"/>
+    </p>
+</script>
+</html>

@@ -1,0 +1,74 @@
+{% extends 'TSKUserBundle:CRUD:base_edit.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="/bundles/tskpayment/js/paymentCalculator.js"></script>
+    <script type="text/javascript" src="/bundles/janl/mustache.js/mustache.js"></script>
+    <script type="text/javascript" src="/bundles/malaney/PaymentCalculator/src/PaymentCalculator.js"></script>
+    <script type="text/javascript">
+        // Your JS code here
+    $(document).ready(function() {
+        $('span.paycal_txt a').click(function(e) {
+            // load payment
+            $pd = $("[id$=paymentsData]")
+            if ($pd) {
+                obj = JSON.parse($pd.val());
+                var url = '{{path('tsk_payment_default_cust')}}';
+                var d = openInDialog(this, url, {'paymentsData': obj});
+            }
+            e.preventDefault();
+            return false;
+        });
+
+    $dialog = $('<div></div>').dialog({
+        autoOpen: false,
+        width: 580,
+        modal: true,
+        show: 'fade',
+        hide: 'fade'
+    });
+
+    function openInDialog(element, target, data) 
+    {
+        var $url = target;
+        var $title = "Calculate Payments"; 
+        $dialog.empty();
+        $dialog.dialog("option", "title", $title);
+
+        if (data) {
+            $dialog.load($url, data, function() {
+                $dialog.data('summary_div', $(element)).data('textarea', $('[id$=paymentsData]')).dialog('open');
+                $dialog.dialog('open');
+            });
+        } else {
+            $dialog.load($url, function() {
+                $dialog.dialog('open');
+            });
+        }
+        return $dialog;
+    }
+    });
+
+    </script>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!--  // styling for rules -->
+    <style type="text/css">
+        .sonata-bc .row-fluid .conjunctionPicker {
+            width: 80%;
+        }
+        .sonata-collection-row .control-group .control-label {
+            width: 1px;
+            display: none;
+        }
+        .sonata-bc .form-horizontal td .controls {
+            margin-left: 10px;
+        }
+        .sonata-bc .form-horizontal .control-label {
+        }
+
+    </style>
+{% endblock %}
+
+{# form_theme form 'TSKContractBundle:Form:fields.html.twig' #}

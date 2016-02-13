@@ -1,0 +1,158 @@
+<html>
+<head>
+    <script type="text/javascript">
+$(document).ready(function() {
+    {% if paymentsData is not empty %}
+{% autoescape false %}
+        var pcJson = '{{paymentsData}}';
+        var pcData = JSON.parse(pcJson);
+{% endautoescape %}
+        paymentCalculator = new PaymentCalculator();
+        paymentCalculator.import(pcData);
+        payments = paymentCalculator.generatePayments();
+        drawPayments(payments, '#{{holder}} #payments');
+    {% endif %}
+    // Read DOM to see if we have any data to pre-load
+
+    $('#{{holder}} #btnSave, #{{holder}} #btnSaveClose').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Export data to DOM
+        // console.log($(this).closest('.ui-dialog-content').closest('textarea'));
+        console.log($(this).closest('.ui-dialog-content').data());
+        var localPC = $(this).closest('.ui-dialog-content').data('peecee');
+        if (typeof localPC != 'undefined') {
+            $(this).closest('.ui-dialog-content').data('textarea').val(JSON.stringify(localPC.export()));
+            $(this).closest('.ui-dialog-content').data('summary_div').html(localPC.generateSummary());
+        } else {
+            console.log('no errors, but no data either');
+        }
+    });
+
+    $('#{{holder}} #btnSaveClose').on('click', function(e) {
+        $(this).closest('.ui-dialog-content').data('dialog').close();
+    });
+
+    $('#{{holder}} #btnGenPayments').click(function() {
+        // Empty payments div
+        $('#{{holder}} #payments').empty();
+
+        var initialPayments = [];
+        var strategyValue = $.isNumeric($('#{{ holder }} #strategy_value').val()) ? $('#{{ holder }} #strategy_value').val() : 0;
+        if ($('#{{ holder }} #payment_strategy').val() == 'dp') {
+            initialPayments[0] = strategyValue;
+        } else if ($('#{{ holder }} #payment_strategy').val() == 'mp') {
+            for (var i=0; i < $('#{{holder}} #num_payments').val(); i++) {
+                initialPayments.push(strategyValue);
+            }
+            initialPayments[0] = 0;
+        }
+
+        try {
+            // compute and draw payments
+            paymentCalculator = new PaymentCalculator({'principal': $('#{{holder}} #principal').val(), 'numPayments': $('#{{holder}} #num_payments').val(), 'initialPayments': initialPayments});
+            payments = paymentCalculator.generatePayments();
+            drawPayments(payments, '#{{holder}} #payments');
+
+            $(this).closest('.ui-dialog-content').data('peecee', paymentCalculator);
+            // console.log($(this).closest('.ui-dialog-content').data('textarea'));
+        } catch (err) {
+            alert(err);
+        }
+    
+       return false;
+    });
+
+    $('#{{holder}} #payment_strategy, #{{holder}} #principal, #{{holder}} #num_payments, #{{holder}} #discount').change(function() {
+        $('#{{holder}} #btnGenPayments').click();
+    });
+    $('#{{holder}} #btnClear').click(function() {
+        // Empty payments div
+        $('#{{holder}} #payments').empty();
+        return false;
+    });
+});
+
+function drawPayments(payments, selector)
+{
+    if (typeof selector == 'undefined') {
+        var selector = '#{{holder}} #payments';
+        console.log(selector);
+    }
+    $(selector).empty();
+    for (i=0; i < payments.length; i++) {
+        var output = Mustache.render($('#paymentWidget').html(), {'idx': i+1, 'payment': payments[i]});
+        $(selector).append(output);
+    }
+
+    $(selector).append('<p><b>Total</b> ' + paymentCalculator.sumPayments() + '</p>');
+}
+    </script>
+    <style type="text/css">
+        div.mine {
+            float: left;
+            padding: 4px;
+            margin: right: 10px;
+        }
+        div.mine:last-of-type {
+            clear: right;
+        }
+    </style>
+</head>
+<form>
+<div id="{{holder}}">
+<blockquote id="pcForm">
+    <legend></legend>
+    <div>
+        <div class="mine">
+            <label for="principal">Principal</label>
+            <input type="text" placeholder="principal" name="principal" id="principal" value="{{principal}}" style="width:100px;" readonly=true />
+        </div>
+        <div class="mine">
+            <label for="num_payments">zzzNum Payments</label>
+            <input type="text" placeholder="num_payments" name="num_payments" id="num_payments" value="{{ num_payments }}" style="width:100px;"/>
+        </div>
+        <div class="mine">
+            <label for="payment_term">Payment Term</label>
+            <select name="payment_term" id="payment_term">
+                <option value="paid_in_full">PAID IN FULL</option>
+                <option value="monthly">MONTHLY</option>
+                <option value="weekly">WEEKLY</option>
+                <option value="bi-weekly">BI-WEEKLY</option>
+            </select>
+        </div>
+    </div>
+    <br/><br/><br/>
+    <br/><br/>
+
+    <label for="payment_strategy">Payment Strategy</label>
+    <select name="payment_strategy" id="payment_strategy">
+        <option value="dp">Set Down Payment Amount</option>
+        <option value="mp">Set Monthly Payment Amount</option>
+    </select>
+    <input type="text" placeholder="" name="strategy_value" id="strategy_value" value="" />
+    <br/>
+
+    <button name="btn" id="btnGenPayments">Generate Payments</button>
+    <button name="btn" id="btnClear">Clear</button>
+</blockquote>
+</form>
+
+<blockquote>
+    <div id="payments"></div>
+    <p>
+        <button name="btn" id="btnSave">Save Payments</button>
+        <button name="btn" id="btnSaveClose">Save Payments & Close</button>
+    </p>
+</blockquote>
+</div>
+
+{% verbatim %}
+<script type="text/template" id="paymentWidget">
+    <p>
+        Payment {{idx}}
+        <input type="text" name="payment[]" class="pmt" value="{{payment}}"/>
+    </p>
+</script>
+{% endverbatim %}
+</html>

@@ -1,0 +1,8 @@
+program:
+    rule_groups: [{ description: 'Program Exclusion', proposition: { description: 'Exclude Pro Plan if first program', clause: 'IF student.numContracts lessThan 1 THEN rewardAddProgramExclude(4)' } }, { description: 'Program Exclusion', proposition: { description: null, clause: 'IF currentRank lessThan 6 THEN rewardAddProgramExclude(4) AND rewardAddProgramExclude(6) AND rewardAddProgramExclude(8)' } }]
+rank:
+    rule_groups: [{ description: 'Green Belt Rules', proposition: { description: null, clause: 'IF currentRank equalTo 62 and numberGrStripesEarnedAtCurrentBelt greaterThan 8 THEN rewardSetEligibleRank(63)' } }, { description: 'White Belt Rules', proposition: { description: null, clause: 'IF currentRank equalTo 2 and numberStripesEarnedAtCurrentBelt greaterThan 8 THEN rewardSetEligibleRank(3)' } }, { description: 'White Belt Rules', proposition: { description: null, clause: 'IF currentRank equalTo 3 and numberStripesEarnedAtCurrentBelt greaterThan 8 THEN rewardSetEligibleRank(4)' } }]
+program.post:
+    rule_groups: [{ description: 'Is Program Family Member Discount Eligible?', proposition: { description: null, clause: 'IF membershipTypeId equalTo 1 THEN rewardInsertTrainingFamilyMember()' } }]
+discount.pre:
+    rule_groups: [{ description: 'Training Family Member Rules', proposition: { description: null, clause: 'IF student.nextAvailableTFMSlot equalTo 2 THEN rewardDiscountType(2)' } }, { description: 'Training Family Member Rules', proposition: { description: null, clause: 'IF student.nextAvailableTFMSlot greaterThan 2 THEN rewardDiscountType(3)' } }, { description: 'Training Family Member Rules', proposition: { description: null, clause: 'IF student.nextAvailableTFMSlot lessThan 2 THEN rewardDiscountType(1)' } }]

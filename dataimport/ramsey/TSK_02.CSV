@@ -1,0 +1,14 @@
+program type,membership type,discount type,program description,legal description,number of tokens,duration days,expiration date,is active,legacy program id
+time,martial arts,none,ONE YEAR,ONE YEAR,0,365,,1,2392-1M-1YR
+time,martial arts,none,PRO,PRO,0,1035,,1,2392-1M-PRO
+time,martial arts,2nd family member,ONE YEAR,ONE YEAR,0,365,,1,2392-2M-1YR
+time,martial arts,2nd family member,PRO,PRO,0,1035,,1,2392-2M-PRO
+time,martial arts,3rd+ family member,ONE YEAR,ONE YEAR,0,365,,1,2392-3M-1YR
+time,martial arts,3rd+ family member,PRO,PRO,0,1035,,1,2392-3M-PRO
+token,martial arts,none,CLASS-BASED,LEGACY,0,9999,20140101,0,2392LEGACYCLASSBASED
+time,martial arts,none,TRIAL,LEGACY,0,14,20140101,0,2392LEGACYTRIAL
+time,martial arts,none,CONV 2X,LEGACY,0,365,20140101,0,2392LEGACYCONV2X
+time,martial arts,none,CONV 3X,LEGACY,0,365,20140101,0,2392LEGACYCONV3X
+time,martial arts,none,CONV 1YR,LEGACY,0,365,20140101,0,2392LEGACYCONV1YR
+time,martial arts,none,CONV PLUS,LEGACY,0,730,20140101,0,2392LEGACYCONVPLUS
+time,martial arts,none,CONV PRO,LEGACY,0,1095,20140101,0,2392LEGACYCONVPRO

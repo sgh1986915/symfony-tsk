@@ -1,0 +1,12 @@
+<table border="1">
+{% for charge in charges %}
+    <tr>
+        <td>{{ charge.getAmount }}</td>
+        <td>{{ charge.getDueDate|date("m/d/Y") }}</td>
+        <td>{{ charge.getDescription }}</td>
+        <td>
+            {{ charge.getOpenAmount }}
+        </td>
+    </tr>
+{% endfor %}
+</table>

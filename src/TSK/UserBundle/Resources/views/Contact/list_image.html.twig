@@ -1,0 +1,7 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    {% if object.imgPath %}
+      row<img src="{{ object.imgPath|get_web_path }}" width="50" height="50"/>
+    {% endif %}
+{% endblock %}

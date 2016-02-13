@@ -1,0 +1,62 @@
+{% block tsk_payment_calculator_widget %}
+    {% spaceless %}
+            {% for child in form %}
+                {{ form_widget(child) }}
+                {% if not hide_button %}
+                <a href="{{ path('tsk_payment_default_calc') }}" class="btn sonata-bc-action btnPaymentCalculator" title="Calculate Payments">
+                    <i class="icon-plus"></i>
+                    Calculate Payments {{ hide_button }} 
+                </a>
+                {% endif %}
+                <div class="paycal" style="display: none;"></div>
+                <br/><span class="paycal_txt"><a href=""></a></span>
+            {% endfor %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block tsk_open_charge_type_widget %}
+    {% spaceless %}
+<div style="border: 1px solid red;">
+{% for child in form %}
+            {{ form_widget(child) }}
+{% endfor %}
+</div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block _tsk_receive_payment_charges_widget %}
+{% spaceless %}
+<div class="charge_row header">
+    <div>&nbsp;</div>
+    <div>Type</div>
+    <div>Due Date</div>
+    <div>Original Amount</div>
+    <div>Open Balance</div>
+    <div>Payment</div>
+</div>
+    {% for child in form %}
+        {% if get_charge_data(child.vars.value, 'getOpenAmount') %}
+<div class="charge_row">
+    <div>
+        {{ form_widget(child) }}
+    </div>
+    <div>
+        {{ form_label(child) }}
+    </div>
+    <div>
+        {{ get_charge_data(child.vars.value, 'getDueDate')|date('m/j/Y') }}
+    </div>
+    <div>
+        {{ get_charge_data(child.vars.value, 'getAmount') }}
+    </div>
+    <div>
+        {{ get_charge_data(child.vars.value, 'getOpenAmount') }}
+    </div>
+    <div>
+        <input class="input-small cpayments" name="payments[{{ child.vars.value }}]" type="text" data-amount="{{ get_charge_data(child.vars.value, 'getOpenAmount') }}" {{ block('widget_attributes') }} />
+    </div>
+</div>
+        {% endif %}
+    {% endfor %}
+{% endspaceless %}
+{% endblock %}

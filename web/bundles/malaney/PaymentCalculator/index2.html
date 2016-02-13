@@ -1,0 +1,95 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="src/PaymentCalculator.js"></script>
+    <script type="text/javascript" src="src/mustache.js"></script>
+    <script type="text/javascript">
+$(document).ready(function() {
+    $('#btnGenPayments').click(function() {
+        // Empty payments div
+        $('#payments').empty();
+
+        var initialPayments = [];
+        var strategyValue = $.isNumeric($('#strategy_value').val()) ? $('#strategy_value').val() : 0;
+        if ($('#payment_strategy').val() == 'dp') {
+            initialPayments[0] = strategyValue;
+        } else if ($('#payment_strategy').val() == 'mp') {
+            for (var i=0; i < $('#num_payments').val(); i++) {
+                initialPayments.push(strategyValue);
+            }
+            initialPayments[0] = 0;
+        }
+
+        try {
+            // compute payments
+            paymentCalculator = new PaymentCalculator({'principal': $('#principal').val(), 'numPayments': $('#num_payments').val(), 'initialPayments': initialPayments});
+            payments = paymentCalculator.generatePayments();
+       
+            for (i=0; i < payments.length; i++) {
+                var output = Mustache.render($('#paymentWidget').html(), {'idx': i+1, 'payment': payments[i]});
+                $('#payments').append(output);
+            }
+
+            $('#payments').append('<p><b>Total</b> ' + paymentCalculator.sumPayments() + '</p>');
+        } catch (err) {
+            alert(err);
+        }
+    
+        // if the value typed into input is a number
+        // we auto-check the override checkbox, otherwise
+        // we auto-uncheck it
+        $('.pmt').on('keyup', function() {
+            if (this.value) {
+                $($(this).siblings('input.ovr').get(0)).prop('checked', !isNaN(parseFloat(this.value)) && isFinite(this.value));
+            }
+        });
+        return false;
+    });
+
+    $('#payment_strategy').change(function() {
+        $('#btnGenPayments').click();
+    });
+    $('#principal, #num_payments').blur(function() {
+        $('#btnGenPayments').click();
+    });
+    $('#btnClear').click(function() {
+        // Empty payments div
+        $('#payments').empty();
+        return false;
+    });
+});
+    </script>
+</head>
+<h2>Payment Calculator</h2>
+<form>
+<blockquote>
+    <legend></legend>
+    <label for="principal">Principal</label>
+    <input type="text" placeholder="principal" name="principal" id="principal" value="1000" />
+    <br/>
+    <label for="num_payments">Num Payments</label>
+    <input type="text" placeholder="num_payments" name="num_payments" id="num_payments" value="5" />
+    <br/>
+
+    <label for="payment_strategy">Payment Strategy</label>
+    <select name="payment_strategy" id="payment_strategy">
+        <option value="dp">Set Down Payment Amount</option>
+        <option value="mp">Set Monthly Payment Amount</option>
+    </select>
+    <input type="text" placeholder="" name="strategy_value" id="strategy_value" value="" />
+    <br/>
+
+    <button name="btn" id="btnGenPayments" value"generatePayments">Generate Payments</button>
+    <button name="btn" id="btnClear" value"generatePayments">Clear</button>
+<blockquote>
+
+    <div id="payments"></div>
+</form>
+
+<script type="text/template" id="paymentWidget">
+    <p>
+        Payment {{idx}}
+        <input type="text" name="payment[]" class="pmt" value="{{payment}}"/>
+    </p>
+</script>
+</html>

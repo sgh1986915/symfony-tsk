@@ -1,0 +1,162 @@
+{% extends 'TSKUserBundle::standard_layout.html.twig' %}
+
+{% block addl_javascripts %}
+
+<script src="{{ asset('bundles/obhighcharts/js/highcharts/highcharts.js') }}"></script>
+<script src="{{ asset('bundles/obhighcharts/js/highcharts/modules/exporting.js') }}"></script>
+<script src="{{ asset('bundles/janl/mustache.js/mustache.js') }}"></script>
+
+
+<script type="text/javascript">
+    {{ chart(chart) }}
+
+$(document).ready(function() {
+
+    $('#rate').popover({
+        'trigger': 'hover',
+        'content': "Click here to set the first month's realized payment and have the system derive your rate.",
+        'trigger': "hover",
+        'title': "Need help computing the rate?"
+    });
+    $('#rateBtn').click(function(e) {
+        e.preventDefault();
+        $('#rateCalculator').modal('show');
+        return false;
+    });
+
+    $('#rateSave').click(function(e) {
+        e.preventDefault();
+        var desiredRealization = $('#desiredRealization').val();
+        desiredRealization = desiredRealization.replace(/\$/g, '');
+        var principal = $('#principal').val();
+
+        if (isNaN(parseInt(principal))) {
+            alert('You must specify a valid number for principal');
+        } else {
+            var computedRate = 1 - (desiredRealization / $('#principal').val());
+            $('#rate').val(computedRate);
+        }
+        $('#rateCalculator').modal('hide');
+        return false;
+    });
+
+    $('#add_payment').click(function() {
+        var output = Mustache.render($('#paymentWidget').html(), {'idx' : $('.foo').length});
+        $('#payments').append(output);
+        return false;
+    });
+
+    $('#clear_payments').click(function() {
+        $('#payments').empty();
+        return false;
+    });
+
+    var payments = {{ payments|json_encode()|raw }};
+    loadPayments(payments);
+});
+function loadPayments(payments)
+{
+    paymentsTotal = 0;
+    $(payments).each(function(idx, payment) {
+        paymentsTotal += parseFloat(payment.amount);
+    });
+    $(payments).each(function(idx, payment) {
+        var output = Mustache.render($('#paymentWidget').html(), {'idx' : $('.foo').length, 'amount': payment.amount, 'period': payment.period, 'paymentsTotal': paymentsTotal });
+        $('#payments').append(output);
+    });
+
+    if (paymentsTotal) {
+        var o = Mustache.render($('#paymentTotalWidget').html(), {'paymentsTotal': paymentsTotal });
+        $('#payments').append(o);
+    }
+}
+</script>
+{% endblock %}
+
+{% block sonata_admin_content %}
+<style type="text/css">
+    div.m {
+        margin: 8px;
+    }
+</style>
+
+
+<form method="post" class="">
+<fieldset>
+    <legend>Deferred Revenue Simulator</legend>
+    <div class="well well-small pull-left">
+    <div class="m pull-left">
+        <label>Principal</label>
+        <input type="text" id="principal" name="principal" value="{{principal}}" class="input-mini" />
+        <div><a href="" id="add_payment">Add Payment</a></div>
+    </div>
+    <div class="m pull-left">
+        <label>Deferral Rate <a href="#rateCalculator" role="button" class="btn btn-mini" id="rateBtn"><i class="icon-pencil"></i></a></label>
+        <input type="text" id="rate" name="rate" class="input-mini" value="{{rate}}" />
+        <div><a href="" id="clear_payments">Clear Payments</a></div>
+    </div>
+    <div class="m pull-left">
+        <label>Recognition Rate</label>
+        <input type="text" id="recognitionRate" name="recognitionRate" class="input-mini" value="{{ recognitionRate }}" />
+    </div>
+    <div class="m pull-left">
+        <label>Recognition Cap</label>
+        <input type="text" id="recognitionCap" name="recognitionCap" class="input-mini" value="{{ recognitionCap }}" />
+    </div>
+
+    <div class="m pull-left">
+        <label>Num Periods</label>
+        <input type="text" id="periods" name="periods" class="input-mini" value="{{periods}}"/>
+    </div>
+    <div class="m pull-left">
+        <label>Distribution Strategy</label>
+        <select name="strategy" class="">
+            <option value="even" {{evenSelected}}>Straight Line</option>
+            <option value="max" {{maxSelected}}>Accelerated</option>
+        </select>
+    </div>
+    <div class="m pull-left">
+        <label>&nbsp;</label>
+        <input type="submit" value="graph" class="btn btn-primary"/>
+    </div>
+    </div>
+    <div id="payments" class="pull-right"></div>
+</fieldset>
+</form>
+<div id="linechart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+<div id="rateCalculator" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="rateCalculatorLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="rateCalculatorLabel">Rate Calculator</h3>
+    </div>
+    <div class="modal-body">
+        <p><form class="form-horizontal">
+            <label>Desired first month's realization</label>
+            <input type="text" placeholder="(i.e. $478)" id="desiredRealization">
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" id="rateSave">Save changes</button>
+    </div>
+</div>
+
+
+
+{% verbatim %}
+<script type="text/template" id="paymentTotalWidget">
+    <p>
+        Total: &nbsp;&nbsp;${{ paymentsTotal }}
+    </p>
+</script>
+<script type="text/template" id="paymentWidget">
+    <p>
+        Payment {{idx}} 
+        Amount <input type="text" name="payments[{{idx}}][amount]" class="input-mini foo" value="{{amount}}"/>
+        Period <input type="text" name="payments[{{idx}}][period]" value="{{period}}" class="input-mini"/>
+    </p>
+</script>
+{% endverbatim %}
+
+{% endblock %}

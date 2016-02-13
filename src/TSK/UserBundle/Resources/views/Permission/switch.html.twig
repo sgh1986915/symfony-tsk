@@ -1,0 +1,37 @@
+{% if form.organization is defined %}
+
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#tsk_user_erp_context_type_organization').change(function() {
+        if (this.value) {
+            $.post(Routing.generate('tsk_user_get_erp_schools', {}), $('form').serialize(), function(data) {
+                $('#schools').empty();
+                $('#schools').html(data);
+            });
+        }
+
+    });
+    
+    // $('#tsk_user_erp_context_type_school').change(function() {
+    //     if (this.value) {
+    //         $(this).parent('form').submit();
+    //     }
+    // });
+});
+</script>
+
+<b>Switch School</b>
+<form method="post" action="{{path('tsk_user_erp_context_save')}}">
+    {{ form_widget(form.organization) }}
+<div id="schools">
+    {% if form.school is defined %}
+        {{ form_widget(form.school) }}
+    {% endif %}
+</div>
+        {{ form_rest(form) }}
+    <input type="submit" value="switch schools" />
+</form>
+{% endif %}

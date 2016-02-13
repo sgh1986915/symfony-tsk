@@ -1,0 +1,132 @@
+tsk_ruler:
+    resource: "@TSKRulerBundle/Controller"
+    type:     annotation
+    prefix:   /admin/ruler/
+
+tsk_rank:
+    resource: "@TSKRankBundle/Controller"
+    type:     annotation
+    prefix:   /admin/rank/
+
+tsk_recurring_payment:
+    resource: "@TSKRecurringPaymentBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+
+tsk_contract:
+    resource: "@TSKContractBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_payment:
+    resource: "@TSKPaymentBundle/Controller/"
+    type:     annotation
+    prefix:   /admin/payment
+
+tsk_schedule_bundle_schedule:
+    resource: "@TSKScheduleBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_billee:
+    resource: "@TSKBilleeBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_instructor:
+    resource: "@TSKInstructorBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_student:
+    resource: "@TSKStudentBundle/Controller/"
+    type:     annotation
+    prefix:   /admin/student
+
+tsk_school:
+    resource: "@TSKSchoolBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_class:
+    resource: "@TSKClassBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+tsk_program:
+    resource: "@TSKProgramBundle/Controller/"
+    type:     annotation
+    prefix:   /admin/program
+
+tsk_user:
+    resource: "@TSKUserBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+
+# Internal routing configuration to handle ESI
+# ****** WARNING ******
+# This route should be enabled with caution as it can open a security vulnerability
+# see http://symfony.com/blog/security-release-symfony-2-0-20-and-2-1-5-released for more information
+# ****** WARNING ******
+#_internal:
+#    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
+#    prefix:   /_internal
+
+admin:
+    resource: '@SonataAdminBundle/Resources/config/routing/sonata_admin.xml'
+    prefix: /admin
+
+_sonata_admin:
+    resource: .
+    type: sonata_admin
+    prefix: /admin
+
+sonata_user:
+    resource: '@SonataUserBundle/Resources/config/routing/admin_security.xml'
+    prefix: /admin
+
+fos_user_security:
+    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+
+fos_user_profile:
+    resource: "@FOSUserBundle/Resources/config/routing/profile.xml"
+    prefix: /profile
+
+fos_user_register:
+    resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
+    prefix: /register
+
+fos_user_resetting:
+    resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
+    prefix: /resetting
+
+fos_user_change_password:
+    resource: "@FOSUserBundle/Resources/config/routing/change_password.xml"
+    prefix: /profile
+
+api_users:
+    type:     rest
+    resource: TSK\UserBundle\Controller\UserController
+    prefix: /api
+
+api_search_users:
+    type: rest
+    resource: TSK\UserBundle\Controller\UserController
+    prefix: /api
+
+api_search_contacts:
+    type: rest
+    resource: TSK\UserBundle\Controller\ContactController
+    prefix: /api
+
+adesigns_calendar:
+  resource: "@ADesignsCalendarBundle/Resources/config/routing.xml"
+
+vince_t_admin_configuration:
+    resource: "@VinceTAdminConfigurationBundle/Resources/config/routing.yml"
+    prefix:   /admin
+

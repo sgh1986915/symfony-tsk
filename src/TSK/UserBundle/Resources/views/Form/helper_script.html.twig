@@ -1,0 +1,258 @@
+{% autoescape false %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.listPopup').each(function() {
+        var randomnumber=Math.floor(Math.random()*100000000);
+        attachModelListDialog(this, this.href + '?rnd=' + randomnumber, randomnumber);
+    });
+    $('.createPopup').each(function() {
+        var randomnumber=Math.floor(Math.random()*100000000);
+        attachModelCreateDialog(this, this.href + '?rnd=' + randomnumber, randomnumber);
+    });
+    $('.editPopup').each(function() {
+        var randomnumber=Math.floor(Math.random()*100000000);
+        attachModelEditDialog(this, this.href + '?rnd=' + randomnumber, randomnumber);
+    });
+
+    // Change handler for name display
+
+    $('#modelName').on('change', function(event) {
+        Admin.log('[{{ id }}] update the label');
+        $('#modelName').html("<span><img src=\"{{ asset('bundles/sonataadmin/ajax-loader.gif') }}\" style=\"vertical-align: middle; margin-right: 10px\"/>{{ 'loading_information'|trans([], 'SonataAdminBundle') }}</span>");
+        jQuery.ajax({
+            type: 'GET',
+            url: '{{ url('sonata_admin_short_object_information', {
+                'objectId': 'OBJECT_ID',
+                'uniqid': uniqid,
+                'code': "ADMIN_NAME"
+            })}}'.replace('OBJECT_ID', $('#{{ id }}').val()).replace('ADMIN_NAME', '{{ admin_name }}'),
+            success: function(html) {
+                html = jQuery(html);
+
+                // html.find('a').attr('class', 'editPopup');
+                inHtml = html.find('a').text();
+                jQuery('#modelName').html('<b>' + inHtml + '</b>&nbsp;&nbsp;');
+            }
+        });
+    });
+});
+
+function updateCreateDialog(div)
+{
+    $('.createDlg form').each(function(idx, o) {
+        $(o).on('submit', function(e) {
+            $(o).ajaxSubmit({
+                url: $(o).attr('action'),
+                type: $(o).attr('method'),
+                data: {_xml_http_request: true },
+                success: function(data) {
+                    if (data.result == 'ok') {
+                        $('#{{ id }}').val(data.objectId);
+                        $('#{{ id }}').change();
+                        $('#modelName').change();
+                        $.data(div, 'dialogx').dialog('close');
+                    }
+                }
+            });
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+    });
+}
+function updateEditDialog(div)
+{
+    $('.editDlg form').each(function(idx, o) {
+        $(o).on('submit', function(e) {
+            $(o).ajaxSubmit({
+                url: $(o).attr('action'),
+                type: $(o).attr('method'),
+                data: {_xml_http_request: true },
+                success: function(data) {
+                    if (data.result == 'ok') {
+                        $('#{{ id }}').val(data.objectId);
+                        $('#{{ id }}').change();
+                        $('#modelName').change();
+                        $.data(div, 'dialogx').dialog('close');
+                    }
+                }
+            });
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+    });
+}
+function updateListDialog(div)
+{
+    $('.listDlg a').each(function(idx, o) {
+        $(o).click(function(e) {
+            if ($(this).parents('td.sonata-ba-list-field').length) {
+                // send this id to the parent
+                var objectId = $(this).parents('td.sonata-ba-list-field').attr('objectid');
+                $('#{{ id }}').val(objectId);
+                $('#{{ id }}').change();
+                $('#modelName').change();
+                $.data(div, 'dialogx').dialog('close');
+            } else {
+                // make a recursive call (ie: reset the filter)
+                $.ajax({
+                    type: 'GET',
+                    url: jQuery(this).attr('href'),
+                    success: function(html) {
+                        Admin.log('[{{ id }}|field_dialog_form_list_link] callback success, attach valid js event');
+                        $('.listDlg').html(html);                    
+                        updateListDialog(div);
+                    }
+                });
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        })
+    });
+
+    $('.listDlg form').each(function(idx, o) {
+        $(o).on('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(o).ajaxSubmit({
+                type: $(o).attr('method'),
+                url: $(o).attr('action'),
+                dataType: 'html',
+                data: {_xml_http_request: true},
+                success: function(html) {
+                    Admin.log('[{{ id }}|field_dialog_form_list_handle_action] form submit success, restoring event');
+                    $('.listDlg').html(html);
+                    updateListDialog(div);
+                }
+            });
+        });
+    });
+}
+
+
+function attachModelCreateDialog(div, url, rnd)
+{
+    $.ajax({
+        url: url,
+        cache: false,
+        // dataType: 'html',
+        data: {_xml_http_request: true },
+        success: function(data) {
+            // This one line took hours ...
+            // dialogs don't like nested forms, so you have to 
+            // move the dialog down to the bottom of the page and
+            // outside of the current form
+            $('.createDlg').appendTo('body');
+            // Load data into div ...
+            $('.createDlg').html(data);
+
+            // attach click handlers and stuff within dialog ...
+            updateCreateDialog(div);
+
+            // Store dialog for this instance
+            $.data(div, 'dialogx',
+                $('.createDlg').dialog({
+                    height: 'auto',
+                    autoOpen: false,
+                    width: 850,
+                    modal: true,
+                    resizable: true,
+                    title: 'Contacts',
+                    zIndex: 9998,
+                    open: function(event, ui) {
+                    }
+                }));
+
+            $(div).on('click', function(e) {
+                $.data(this, 'dialogx').dialog('open');
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+        }
+    });
+}
+
+function attachModelEditDialog(div, url, rnd)
+{
+    $.ajax({
+        url: url,
+        cache: false,
+        // dataType: 'html',
+        data: {_xml_http_request: true },
+        success: function(data) {
+            // This one line took hours ...
+            // dialogs don't like nested forms, so you have to 
+            // move the dialog down to the bottom of the page and
+            // outside of the current form
+            $('.editDlg').appendTo('body');
+            // Load data into div ...
+            $('.editDlg').html(data);
+
+            // attach click handlers and stuff within dialog ...
+            updateEditDialog(div);
+
+            // Store dialog for this instance
+            $.data(div, 'dialogx',
+                $('.editDlg').dialog({
+                    height: 'auto',
+                    autoOpen: false,
+                    width: 850,
+                    modal: true,
+                    resizable: true,
+                    title: 'Contacts',
+                    zIndex: 9998,
+                    open: function(event, ui) {
+                    }
+                }));
+
+            $(div).on('click', function(e) {
+                $.data(this, 'dialogx').dialog('open');
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+        }
+    });
+}
+
+function attachModelListDialog(div, url, rnd)
+{
+    $.ajax({
+        url: url,
+        cache: false,
+        success: function(data) {
+            // Load data into dialog div ...
+            $('.listDlg').html(data);
+
+            // attach click handlers and stuff within dialog ...
+            updateListDialog(div);
+
+            // Store dialog for this instance
+            $.data(div, 'dialogx',
+                $('.listDlg').dialog({
+                    height: 'auto',
+                    autoOpen: false,
+                    width: 850,
+                    modal: true,
+                    resizable: true,
+                    title: 'Contacts',
+                    zIndex: 9998,
+                    open: function(event, ui) {
+                    }
+                }));
+
+            // Attach click handler for this instance
+            $(div).on('click', function(e) {
+                $.data(this, 'dialogx').dialog('open');
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+        }
+    });
+}
+</script>
+{% endautoescape %}

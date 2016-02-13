@@ -1,0 +1,70 @@
+services:
+    tsk.admin.student:
+        class: TSK\StudentBundle\Admin\StudentAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Students" }
+        arguments: [null, TSK\StudentBundle\Entity\Student, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ addExtension, [@tsk.admin.contact_extension] ]
+            - [ setTemplate, ['list', 'TSKStudentBundle:CRUD:list.html.twig'] ]
+
+
+    tsk_student.form.registerStudent:
+        class: TSK\StudentBundle\Form\RegisterStudentFormType
+        arguments: [ @tsk.admin.contact_student, @tsk.admin.contact_emergency, @tsk.admin.contact_billee ]
+        tags:
+            - { name: form.type, alias: registerStudent }
+        calls:
+            - [ setSession, [@session, %tsk_user.session.org_key%] ]
+        scope: prototype
+
+    
+
+    tsk_student.form.flow.registerStudent:
+        class: TSK\StudentBundle\Form\RegisterStudentFlow
+        scope: prototype
+        parent: craue.form.flow
+        calls: 
+            - [ setFormType, [@tsk_student.form.registerStudent ] ]
+
+
+    tsk_student.status_listener.pre_persist:
+        class: TSK\StudentBundle\EventListener\StatusUpdateListener
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: doctrine.event_listener, event: prePersist, method: prePersist }
+
+    tsk_student.status_listener.pre_update:
+        class: TSK\StudentBundle\EventListener\StatusUpdateListener
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate, method: preUpdate }
+
+    tsk_student.student_rank_listener.post_persist:
+        class: TSK\StudentBundle\EventListener\StudentRankListener
+        tags:
+            - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+
+    tsk_student.student_rank_listener.pre_update:
+        class: TSK\StudentBundle\EventListener\StudentRankListener
+        tags:
+            - { name: doctrine.event_listener, event: postUpdate, method: postUpdate }
+
+    tsk_student.event_listener.student_progress_listener:
+        class: TSK\StudentBundle\EventListener\StudentProgressListener
+        arguments: [@doctrine.orm.entity_manager, @tsk_rank.ruler.rank_rules_engine]
+        tags:
+            - { name: kernel.event_listener, event: tsk.student.progress, method: onStudentProgress }
+
+    tsk_student.event_listener.student_pre_registration_listener:
+        class: TSK\StudentBundle\EventListener\StudentRegistrationListener
+        arguments: [@doctrine.orm.entity_manager, @tsk_payment.ruler.discount_rules_engine]
+        tags:
+            - { name: kernel.event_listener, event: tsk.student.pre_registration, method: onPreRegistration }
+
+    tsk_student.event_listener.student_post_registration_listener:
+        class: TSK\StudentBundle\EventListener\StudentRegistrationListener
+        arguments: [@doctrine.orm.entity_manager, @tsk_program.ruler.program_rules_engine]
+        tags:
+            - { name: kernel.event_listener, event: tsk.student.post_registration, method: onPostRegistration }

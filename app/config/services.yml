@@ -1,0 +1,102 @@
+services:
+    sonata.user.admin.user:
+        abstract: true
+        public: false
+
+    sonata.user.admin.group:
+        abstract: true
+        public: false
+
+
+    tsk.registration.form_type:
+        class: TSK\UserBundle\Form\Type\RegistrationFormType
+        arguments: [%fos_user.model.user.class%]
+        tags:
+            - { name: form.type, alias: tsk_user_registration }
+
+    tsk_class.class_type.form_type:
+        class: TSK\ClassBundle\Form\Type\ClassTypeType
+        arguments: [@doctrine.orm.default_entity_manager, @session, %tsk_user.session.org_key%]
+        tags:
+            - { name: form.type, alias: tsk_class_types }
+
+    # tsk.empty.navbar:
+    #     class: TSK\UserBundle\Navbar\GenericNavbar
+    #     arguments:
+    #         # first argument: a named array of menues:
+    #         - { leftmenu: @tsk.emptymenu=, rightmenu: @tsk.exampledropdown= }
+    #         # second argument: a named array of FormType Classes
+    #         - { searchform: TSK\UserBundle\Form\Type\EmptySearchFormType }
+    #         # third argument: a named array of options
+    #         - { title: "TSK ERP System", titleRoute: "tsk_user_welcome_index", fixedTop: true, isFluid: false }
+    #     tags:
+    #         # The alias is used to retrieve the navbar in templates
+    #         - { name: mopa_bootstrap.navbar, alias: tskEmptyNavBar }
+
+
+    # tsk.example.navbar:
+    #     class: TSK\UserBundle\Navbar\GenericNavbar
+    #     arguments:
+    #         # first argument: a named array of menues:
+    #         - { leftmenu: @tsk.examplemenu=, rightmenu: @tsk.exampledropdown= }
+    #         # second argument: a named array of FormType Classes
+    #         - { searchform: TSK\UserBundle\Form\Type\EmptySearchFormType }
+    #         # third argument: a named array of options
+    #         - { title: "TSK ERP System", titleRoute: "tsk_user_welcome_index", fixedTop: true, isFluid: false }
+    #     tags:
+    #         # The alias is used to retrieve the navbar in templates
+    #         - { name: mopa_bootstrap.navbar, alias: tskNavBar }
+
+
+    # tsk.exampledropdown:
+    #     class: Knp\Menu\MenuItem
+    #     factory_service: tsk.examplemenu_builder
+    #     factory_method: createRightSideDropdownMenu
+    #     arguments: ["@request", "@liip_theme.active_theme"]
+    #     scope: request # needed as we have the request as a dependency here
+    #     tags:
+    #         - { name: knp_menu.menu, alias: tskdropdown } # The alias is what is used to retrieve the menu
+
+    # tsk.examplemenu_builder:
+    #     class: TSK\UserBundle\Navbar\Example\MenuBuilder
+    #     arguments: ["@knp_menu.factory", "@security.context"]
+
+    # tsk.examplemenu:
+    #     class: Knp\Menu\MenuItem # the service definition requires setting the class
+    #     factory_service: tsk.examplemenu_builder
+    #     factory_method: createMainMenu
+    #     arguments: ["@request"]
+    #     scope: request # needed as we have the request as a dependency here
+    #     tags:
+    #         - { name: knp_menu.menu, alias: examplemain } # The alias is what is used to retrieve the menu
+
+    # tsk.emptymenu:
+    #     class: Knp\Menu\MenuItem # the service definition requires setting the class
+    #     factory_service: tsk.examplemenu_builder
+    #     factory_method: createEmptyMenu
+    #     arguments: ["@request"]
+    #     scope: request # needed as we have the request as a dependency here
+    #     tags:
+    #         - { name: knp_menu.menu, alias: examplemain } # The alias is what is used to retrieve the menu
+
+    # gedmo.listener.timestampable:
+    #     class: Gedmo\Timestampable\TimestampableListener
+    #     tags:
+    #         - { name: doctrine.event_subscriber, connection: default }
+    #     calls:
+    #         - [ setAnnotationReader, [ @annotation_reader ] ]
+
+    # gedmo.listener.blameable:
+    #     class: Gedmo\Blameable\BlameableListener
+    #     tags:
+    #         - { name: doctrine.event_subscriber, connection: default }
+    #     calls:
+    #         - [ setAnnotationReader, [ @annotation_reader ] ]
+
+
+
+
+    security.role_hierarchy:
+        class: TSK\UserBundle\Security\Role\RoleHierarchy
+        arguments: [@doctrine.orm.entity_manager]
+

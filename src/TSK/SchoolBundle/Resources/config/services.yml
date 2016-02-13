@@ -1,0 +1,26 @@
+services:
+    tsk.admin.school:
+        class: TSK\SchoolBundle\Admin\SchoolAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Contacts", label: "Schools" }
+        arguments: [null, TSK\SchoolBundle\Entity\School, SonataAdminBundle:CRUD]
+        calls:
+            - [ addExtension, [@tsk.admin.school_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk.admin.school_extension:
+        class: TSK\SchoolBundle\Admin\SchoolAdminExtension
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: sonata.admin.extension }
+
+    tsk_school.admin.block.school_switcher:
+        class: TSK\SchoolBundle\Block\SchoolSwitcherBlockService
+        arguments: ['tsk_school.admin.block.school_switcher', @templating, @doctrine.orm.default_entity_manager, @session, %tsk_user.session.school_key%, %tsk_user.session.org_key%, @security.context]
+        tags:
+            - { name: sonata.block }
+
+    tsk_school.event_listener.school_listener:
+        class: TSK\SchoolBundle\EventListener\SchoolListener
+        tags:
+            - { name: doctrine.event_listener, event: postPersist, method: postPersist }

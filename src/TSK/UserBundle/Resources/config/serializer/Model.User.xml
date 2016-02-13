@@ -1,0 +1,5 @@
+<serializer>  
+    <class name="FOS\UserBundle\Model\User" xml-root-name="foob" exclusion-policy="all" exclude="false">
+        <property name="username" type="string" expose="true" access-type="public_method"></property>
+    </class>  
+</serializer>  

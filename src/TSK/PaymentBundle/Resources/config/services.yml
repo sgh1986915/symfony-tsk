@@ -1,0 +1,107 @@
+services:
+    tsk_payment.form.type.payment_calculator:
+        class: TSK\PaymentBundle\Form\Type\PaymentCalculatorType
+        tags: 
+            - { name: form.type, alias: tsk_payment_calculator }
+
+    tsk_payment.twig.payment_calculator_extension:
+        class: TSK\PaymentBundle\Twig\Extension\PaymentCalculatorExtension
+        tags:
+            - { name: twig.extension }
+
+    tsk_payment.twig.credit_card_extension:
+        class: TSK\PaymentBundle\Twig\Extension\CreditCardExtension
+        tags:
+            - { name: twig.extension }
+
+    tsk_payment.form.type.receivePayment:
+        class: TSK\PaymentBundle\Form\Type\ReceivePaymentType
+        tags:
+            - { name: form.type, alias: tsk_receive_payment }
+        arguments: [ @session, %tsk_user.session.org_key%, @doctrine.orm.entity_manager, @tsk.admin.contact ] 
+        scope: prototype
+
+    tsk_payment.form.type.openChargeType:
+        class: TSK\PaymentBundle\Form\Type\OpenChargeType
+        tags:
+            - { name: form.type, alias: tsk_open_charge_type }
+
+    tsk_payment.form.type.ChargePaymentType:
+        class: TSK\PaymentBundle\Form\Type\ChargePaymentType
+        tags:
+            - { name: form.type, alias: tsk_charge_payment_type }
+
+    tsk_payment.twig.chargedata_extension:
+        class: TSK\PaymentBundle\Twig\Extension\ChargeDataExtension
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: twig.extension }
+
+    tsk_payment.form.event_listener.receive_payment:
+        class: TSK\PaymentBundle\Form\EventListener\ReceivePaymentListener
+        arguments: [@form.factory, @doctrine.orm.entity_manager]
+
+    tsk_payment.payment_methods.admin:
+        class: TSK\PaymentBundle\Admin\PaymentMethodsAdmin
+        arguments: [null, TSK\PaymentBundle\Entity\PaymentMethod, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Payments", label: "Payment Methods"}
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk_payment.deferral.admin:
+        class: TSK\PaymentBundle\Admin\DeferralAdmin
+        arguments: [null, TSK\PaymentBundle\Entity\Deferral, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Payments", label: "Deferrals"}
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk_payment.discount.admin:
+        class: TSK\PaymentBundle\Admin\DiscountAdmin
+        arguments: [null, TSK\PaymentBundle\Entity\DiscountType, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Payments", label: "Discount Types"}
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', 'TSKPaymentBundle:Admin:discount_edit.html.twig'] ]
+
+    tsk_payment.ruler.discount_rules_engine:
+        class: TSK\PaymentBundle\Ruler\DiscountRulesEngine
+        arguments: [@doctrine.orm.entity_manager, @tsk_payment.ruler.discount_rewards_engine, true]
+        calls:
+            - [ setLogger, [@logger] ]
+
+    tsk_payment.ruler.discount_rewards_engine:
+        class: TSK\PaymentBundle\Ruler\DiscountReward
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: tsk_ruler.rewards_engine, alias: 'discount' }
+
+    tsk_payment.event_listener.payment_listener:
+        class: TSK\PaymentBundle\EventListener\PaymentListener
+        arguments: [@doctrine.orm.entity_manager]
+        tags:
+            - { name: kernel.event_listener, event: tsk.payment.receive, method: onReceive }
+
+    tsk_payment.product.admin:
+        class: TSK\PaymentBundle\Admin\ProductAdmin
+        arguments: [null, TSK\PaymentBundle\Entity\Product, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Payments", label: "Products"}
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+
+    tsk_payment.collect.admin:
+        class: TSK\PaymentBundle\Admin\CollectAdmin
+        arguments: [null, TSK\PaymentBundle\Entity\Collect, null]
+        tags: 
+            - { name: sonata.admin, manager_type: "orm", group: "Payments", label: "Collect a Payment"}
+        calls:
+            - [ addExtension, [@tsk.admin.class_extension] ]
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+

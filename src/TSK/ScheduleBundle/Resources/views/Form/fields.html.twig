@@ -1,0 +1,51 @@
+{% block tsk_schedule_options_widget %}
+    {% spaceless %}
+        {% for child in form %}
+            <label class="checkbox inline">
+                {{ form_widget(child) }}
+                {{ child.vars.label }}
+                {% if child.vars.label == 'Repeat' %}
+                <span id="recurringSummary"> ...</span>
+                {% endif %}
+            </label>
+        {% endfor %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block datePicker_widget %}
+    {% spaceless %}
+        <input type="text" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        {%  set attr = attr|merge({'class': ((attr.class|default('') ~ ' AcmeDatePicker')|trim)}) %}
+        {% set  id = id ~ "_datepicker" %}
+        {% set  full_name = "datepicker_" ~ full_name  %}
+        <input type="text" {{ block('widget_attributes') }}/>
+    {% endspaceless %}
+{% endblock datePicker_widget %}
+
+{% block dateTimePicker_widget %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' acmeDateTimePicker')|trim}) %}
+
+        {{ form_errors(form.date) }}
+        {{ form_errors(form.time) }}
+        <div class="pull-left">
+        {{ form_widget(form.date, {'id' : id ~ '_date'}) }}
+        &nbsp;&nbsp;
+        </div>
+        {{ form_widget(form.time, {'id' : id ~ '_time'}) }}
+    
+{% endblock dateTimePicker_widget %}
+
+{% block tsk_schedule_repeat_ends_widget %}
+    {% for child in form.ends_type %}
+        <label class="radio">
+        {{ form_widget(child) }}
+        {{ child.vars.label }}&nbsp;
+            {% if child.vars.value == 'after' %}
+                {{ form_widget(form.num_occurrences) }} occurrences
+            {% elseif child.vars.value == 'until' %}
+                {{ form_widget(form.until_date) }}
+            {% endif %}
+        </label>
+    {% endfor %}
+    {{ form_widget(form.ends_type) }}
+{% endblock tsk_schedule_repeat_ends_widget %}

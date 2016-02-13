@@ -1,0 +1,43 @@
+<div>
+    <dl class="dl-horizontal">
+        <dt>Title</dt>
+        <dd>{{ scheduleInstance.getTitle }}</dd>
+        <dt>Description</dt>
+        <dd>&nbsp;{{ scheduleInstance.getScheduleEntity.getDescription }}</dd>
+        {% if scheduleInstance.getScheduleEntity.getCategory.getName == 'class' %}
+        <dt>Instructor</dt>
+        <dd>
+            {% for instructor in scheduleInstance.getScheduleEntity.getInstructors %}
+                {{ instructor.getContact.getFirstName }} {{ instructor.getContact.getLastName }}
+            {% endfor %}
+            &nbsp;
+        </dd>
+
+            {% set _class = "" %}
+            {% for class in scheduleInstance.getScheduleEntity.getClasses %}
+                {% set _class = class %}
+            {% endfor %}
+        {% endif %}
+        <dt>Starts</dt>
+        <dd>{{ scheduleInstance.getStart|date('Y-m-d H:i') }}</dd>
+        <dt>Ends</dt>
+        <dd>{{ scheduleInstance.getEnd|date('Y-m-d H:i') }}</dd>
+        {% if scheduleInstance.getScheduleEntity.getRrule %}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var rruleText = '{{ scheduleInstance.getScheduleEntity.getRrule }}';
+                var rrule = RRule.fromString(rruleText);
+                $('#detailRrule').html(rrule.toText());
+            });
+                
+        </script>
+        <dt>Meets</dt>
+        <dd id="detailRrule"></dd>
+        {% endif %}
+    </dl> 
+</div>
+
+<br/>
+{% if _class %}
+    <a href="{{ path('tsk_schedule_roster_index', {id: scheduleInstance.getScheduleEntity.getId, class: _class.getId, date: scheduleInstance.getStart|date('Y-m-d') }) }}" class="btn">Roster / Attendance</a>
+{% endif %}

@@ -1,0 +1,556 @@
+{% extends 'SonataAdminBundle::standard_layout.html.twig' %}
+
+{% block content %}
+
+    <div class="panel-group" id="accordion">
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#programs">
+          				Programs
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="programs" class="panel-collapse collapse in">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Programs
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_program_program_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_program_program_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Membership Types
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_program_membershiptype_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_program_membershiptype_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Program Types
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_program_programtype_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_program_programtype_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Program Payment Plans
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_program_programpaymentplan_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_program_programpaymentplan_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Contracts
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_contract_contract_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_contract_contract_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Contract Templates 
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_contract_contracttemplate_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_contract_contracttemplate_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#contracts">
+          				Contacts
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="contracts" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Contacts
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_user_contact_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_user_contact_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Users
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_user_user_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_user_user_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Corporations
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_user_corporation_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_user_corporation_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Instructors
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_instructor_instructor_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_instructor_instructor_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Schools
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_school_school_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_school_school_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Students
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_student_student_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_student_student_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#organizations">
+          				Organizations
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="organizations" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Organizations
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_user_organization_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_user_organization_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Roles
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_user_role_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_user_role_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#classes">
+          				Classes
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="classes" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Classes
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_class_classes_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_class_classes_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	ClassTypes
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_class_classtype_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_class_classtype_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	ClassTypeCredit
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_class_classtypecredit_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_class_classtypecredit_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#schedules">
+          				Schedules
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="schedules" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Locations
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_schedule_schedulelocation_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_schedule_schedulelocation_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Categories
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_schedule_schedulecategory_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_schedule_schedulecategory_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Entities
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_schedule_scheduleentity_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_schedule_scheduleentity_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#payments">
+          				Payments
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="payments" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Payment Methods
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_payment_paymentmethod_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_payment_paymentmethod_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Deferrals
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_payment_deferral_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_payment_deferral_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Discount Types
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_payment_discounttype_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_payment_discounttype_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Products
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_payment_product_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_payment_product_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Collect Payment
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_payment_collect_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_payment_collect_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#ranks">
+          				Rank
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="ranks" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Ranks
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_rank_rank_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_rank_rank_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#configuration">
+          				Configuration
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="configuration" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Manage sections 
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configsection_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configsection_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Manage groups 
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configgroup_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configgroup_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Manage values 
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configvalue_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configvalue_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Manage types 
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configtype_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_vincet_adminconfiguration_configtype_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+      			<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#ruler">
+          				Ruler
+        			</a>
+      			</h4>
+    		</div>
+    		<div id="ruler" class="panel-collapse collapse">
+      			<div class="panel-body">
+        			<table class="table table-striped">
+        				<tbody>
+        					<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Rule Groups
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_ruler_rulegroup_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_ruler_rulegroup_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Facts
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_ruler_fact_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_ruler_fact_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	Rewards
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_ruler_reward_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_ruler_reward_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	RuleContext
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_ruler_rulecontext_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_ruler_rulecontext_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+                        	<tr>
+                            	<td class="sonata-ba-list-label">
+                                	RuleCollection
+                            	</td>
+                            	<td>
+                                	<div class="btn-group">
+                                		<a href="{{ url('admin_tsk_ruler_rulecollection_create') }}" class="btn btn-link"><i class="icon-plus"></i>Add new</a>
+                                		<a href="{{ url('admin_tsk_ruler_rulecollection_list') }}" class="btn btn-link"><i class="icon-list"></i>List</a>
+									</div>
+								</td>
+                        	</tr>
+        				</tbody>
+        			</table>
+      			</div>
+    		</div>
+  		</div>
+  		
+	</div>
+    
+{% endblock %}

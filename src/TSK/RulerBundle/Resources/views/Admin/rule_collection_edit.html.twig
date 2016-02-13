@@ -1,0 +1,169 @@
+{% extends 'SonataAdminBundle:CRUD:edit.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!--  // styling for rules -->
+    <style type="text/css">
+        .sonata-bc .form-horizontal .controls.foo {
+            margin-left: 0px;
+        }
+    div.controls.sonata-ba-field.sonata-ba-field-inline-standard > div > div.controls {
+        margin-left; 10px;
+    }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+<script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+    <script type="text/javascript">
+        $(document).on('sonata-collection-item-added', function(e) {
+            $('.factPicker').trigger('change');
+            $('.methodPicker').trigger('change');
+        });
+        // Your JS code here
+        function currentRank($elem)
+        {
+            $.get(Routing.generate('tsk_rank_default_dropdown', {rankId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function programId($elem)
+        {
+            $.get(Routing.generate('tsk_program_default_dropdown', {programId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function membershipTypeId($elem)
+        {
+            $.get(Routing.generate('tsk_program_default_membershipdropdown', {membershipTypeId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function rewardAddProgramExclude($elem)
+        {
+            $.get(Routing.generate('tsk_program_default_dropdown', {programId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function rewardSetEligibleRank($elem)
+        {
+            $.get(Routing.generate('tsk_rank_default_dropdown', {rankId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function rewardDiscountType($elem)
+        {
+            $.get(Routing.generate('tsk_payment_default_dropdown', {discountTypeId: $elem.attr('value')}), function(data) {
+                mydata = data.replace("form[value]", $elem.attr('name'));
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        function renderRankDropdown($elem, inputName, inputValue) {
+            // optional argument
+            inputValue = (typeof inputValue === "undefined") ? "" : inputValue;
+            $.get(Routing.generate('tsk_rank_default_dropdown', {rankId: inputValue}), function(data) {
+                mydata = data.replace("form[value]", inputName);
+                $elem.replaceWith(mydata);
+            });
+        }
+
+        $(document).ready(function() {
+            $('.methodPicker').live('change', function() {
+                var optionText = this.options[this.selectedIndex].text;
+                var $closestInput = $(this).closest('tr').find('input[type="text"]');
+                var $closestSelect = $(this).closest('tr').find('select[name$="[metaData]"]');
+                // we have to determine which of the elements exist, the input or select?
+                if ($closestInput.length) {
+                    $elem = $closestInput;
+                }
+                if ($closestSelect.length) {
+                    $elem = $closestSelect;
+                }
+
+                var fn = window[optionText];
+                if (typeof fn == 'function') {
+                    if ($elem) {
+                        fn($elem);
+                    }
+                } else {
+                    $elem.replaceWith('<input type="text" value="' + $elem.attr('value') + '" name="' + $elem.attr('name') + '" />');
+                }
+             });
+
+             $('.factPicker').live('change', function() {
+                var optionText = this.options[this.selectedIndex].text;
+                var parts = optionText.split(/ /);
+
+                var $closestInput = $(this).closest('tr').find('input[type=text]');
+                var $closestSelect = $(this).closest('tr').find('select[name$="[value]"]');
+                // we have to determine which of the elements exist, the input or select?
+                if ($closestInput.length) {
+                    $elem = $closestInput;
+                }
+                if ($closestSelect.length) {
+                    $elem = $closestSelect;
+                }
+                if ($elem) {
+                    switch (parts[1]) {
+                        case '(callback)':
+                            var fn = window[parts[0]];
+                            if (typeof fn == 'function') {
+                                fn($elem);
+                            }
+                        break;
+
+                        default:
+                            $elem.replaceWith('<input type="text" value="' + $elem.attr('value') + '" name="' + $elem.attr('name') + '" />');
+                        break;
+                     }
+                 }
+             });
+
+
+            // For initial page loading
+            $('.factPicker').trigger('change');
+            $('.methodPicker').trigger('change');
+
+            $('div[id^="sonata-ba-field-container"][id$="rules"]').on('sonata.add_element', function(event) {
+                // redraw any rank selects as dropdowns
+                // insert here your code
+                $('.factPicker').each(function(idx, o) {
+                    if ($(o).val() == 1) {
+                        var $closestInput = $(this).closest('tr').find('input[type=text]');
+                        renderRankDropdown($closestInput, $closestInput.attr('name'), $closestInput.val());
+                    }
+                });
+            });
+
+            $('a.btn.sonata-collection-delete').on('sonata-collection-item-deleted', function(e) {
+                // need to ajax remove row ...
+                var idStr = $(this).closest('.sonata-collection-row').find('select').attr('id');
+                var parts = idStr.split(/_/);
+                var pathArray = window.location.pathname.split( '/' );
+                if (parts[3] == 'rules') {
+                    $.get(Routing.generate('tsk_ruler_rcdeleterule', {ruleCollectionId: pathArray[6], ruleGroupIdx: parts[2], ruleIdx: parts[4]}), function(data) {
+                        alert('rule deleted');
+                    });
+                } else if (parts[3] == 'rewards') {
+                    $.get(Routing.generate('tsk_ruler_rcdeletereward', {ruleCollectionId: pathArray[6], ruleGroupIdx: parts[2], rewardIdx: parts[4]}), function(data) {
+                        alert('reward deleted');
+                    });
+                }
+
+            });
+        });
+    </script>
+{% endblock %}

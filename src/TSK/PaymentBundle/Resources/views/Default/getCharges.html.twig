@@ -1,0 +1,4 @@
+howdy
+{% for charge in charges %}
+    <b>{{ charge.getAmount }} - {{ charge.getDueDate|date("m/d/Y") }} - {{ charge.getDescription }}</b><br/>
+{% endfor %}

@@ -1,0 +1,74 @@
+{% extends 'TSKUserBundle::layout.html.twig' %}
+
+{% block content %}
+<h2>{{ student }}</h2>
+<div>
+    <input type="submit" value="Attend KB Class" />
+    <input type="submit" value="Attend GR Class" />
+</div>
+<br clear="all" />
+<b>Eligible Ranks</b>  
+{% if student.getEligibleRanks.count %}
+{% for form in forms %}
+    <form action="{{ path('tsk_student_default_promote', {id: student.getId }) }}" method="post">
+        {{ form_widget(form) }}
+        <input type="submit" value="Promote {{ student }} to {{ form.rank.vars.data.getDescription }}" class="btn" />
+    </form>
+{% endfor %}
+{% else %}
+Not eligible for anything at this time.
+{% endif %}
+
+<table class="table table-condensed table-striped">
+    <thead>
+        <tr>
+            <th>Fact</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>current rank</td><td>{{ student.getRank }}</td>
+        </tr>
+        <tr>
+            <td>number stripes earned at current belt</td>
+            <td>{{ numberStripesEarnedAtCurrentBelt }}
+        </tr>
+        <tr>
+            <td>number kb stripes earned at current belt</td>
+            <td>{{ numberKbStripesEarnedAtCurrentBelt }}
+        </tr>
+        <tr>
+            <td>number gr stripes earned at current belt</td>
+            <td>{{ numberGrStripesEarnedAtCurrentBelt }}
+        </tr>
+        <tr>
+            <td>last promotion date</td>
+            <td>{{ lastPromotionDate|date('Y-m-d') }}
+        </tr>
+        <tr>
+            <td>last kb promotion date</td>
+            <td>{{ lastKbPromotionDate|date('Y-m-d') }}
+        </tr>
+        <tr>
+            <td>last gr promotion date</td>
+            <td>{{ lastGrPromotionDate|date('Y-m-d') }}
+        </tr>
+        <tr>
+            <td>credits earned since last promotion</td>
+            <td>{{ creditsEarnedSinceLastPromotion }}
+        </tr>
+        <tr>
+            <td>kb credits earned since last kb promotion</td>
+            <td>{{ kbCreditsEarnedSinceLastKbPromotion }}
+        </tr>
+
+        <tr>
+            <td>gr credits earned since last gr promotion</td>
+            <td>{{ grCreditsEarnedSinceLastGrPromotion }}
+        </tr>
+
+
+    </tbody>
+</table>
+{% endblock %}

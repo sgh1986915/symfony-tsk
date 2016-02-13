@@ -1,0 +1,23 @@
+{% extends sonata_block.templates.block_base %}
+{% block block %}
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#school_switch').change(function(e) {
+        old_action = $('#school_sw').attr('action');
+        new_value = old_action.replace('000', this.value);
+        alert(new_value);
+        $('#school_sw').attr('action', new_value)
+        $('#school_sw').submit();       
+    });
+});
+</script>
+<form id="school_sw" method="post" action="{{ path('school_switch', {'id': '000'}) }}">
+<label for="school_switch">Switch Schools</label>
+    <select name="school" id="school_switch">
+        <option value="">[Switch School]</option>
+        {% for school in schools %}
+            <option value="{{school.id}}" {{school.selected}}>{{school.title}}</option>
+        {% endfor %}
+    </select>
+</form>
+{% endblock %}

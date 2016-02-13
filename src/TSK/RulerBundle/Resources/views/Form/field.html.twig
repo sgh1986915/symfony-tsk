@@ -1,0 +1,25 @@
+{% block tsk_rule_widget %}
+    {% spaceless %}
+        <table>
+            <tr>
+                <td>{{ form_widget(form.fact) }}</td>
+                <td>{{ form_widget(form.comparator) }}</td>
+                <td>{{ form_widget(form.value) }}</td>
+            </tr>
+        </table>
+            {{ form_rest(form) }}
+    {% endspaceless %}
+{% endblock %}
+
+{% block tsk_reward_widget %}
+    {% spaceless %}
+        <table>
+            <tr>
+                <td>{{ form_widget(form.method) }}</td>
+                <td>{{ form_widget(form.metaData) }}</td>
+            </tr>
+        </table>
+            {{ form_rest(form) }}
+    {% endspaceless %}
+{% endblock %}
+

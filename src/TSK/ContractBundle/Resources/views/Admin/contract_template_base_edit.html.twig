@@ -1,0 +1,84 @@
+{% extends 'TSKUserBundle:CRUD:base_edit.html.twig' %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sonataadmin/x-editable/js/bootstrap-editable.min.js') }}"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+    <script type="text/javascript">
+        // Your JS code here
+        $(document).ready(function() {
+            // When switching version dropdown, replace textarea with results of ajax call
+            $('select[id*="version"]').after('&nbsp;&nbsp;<span id="activate"></span>');
+            $('select[id*="version"]').change(function() {
+                if (this.value) {
+                    $('#activate').html('<a href="" class="make_active_version">save as active version</a>');
+                    var objectId = {{ object.getId }};
+                    $.get(Routing.generate('tsk_contract_template_version', {object_id: objectId, version: this.value}), function(data) {
+                        // var result = $('<div/>').html(data.template).html();
+                        $('textarea').val(stripslashes(data.template));
+                        $('input[id*="description"]').val(data.description);
+                    });
+                } else {
+                    $('textarea').val('');
+                    $('#activate').html('');
+                }
+            });
+
+            // trigger a change action onload
+            $('select[id*="version"]').trigger('change');
+            $('textarea').val(stripslashes($('textarea').val()));
+
+            // Once textarea is modified, clear description field so that user
+            // is prompted to enter a new reason for change.
+            $('textarea').bind('input propertychange', function() {
+                if (!$(this).data('dirty')) {
+                    $('input[id*="description"]').val('');
+                    $(this).data('dirty', 1);
+                }
+            });
+
+            $('#activate').on('click', function(e) {
+                e.preventDefault();
+                var arr = document.URL.split(/\//);
+                var templateId = arr[8];
+                console.log(templateId);
+                selectedVersion = $('select[id*="version"]').val();
+                $.get(Routing.generate('tsk_contract_default_activate', {id: templateId, version: selectedVersion}), function(data) {
+                    alert('version is active!');
+                });
+                return false;
+            });
+        });
+
+
+
+        function stripslashes (str) {
+          // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+          // +   improved by: Ates Goral (http://magnetiq.com)
+          // +      fixed by: Mick@el
+          // +   improved by: marrtins
+          // +   bugfixed by: Onno Marsman
+          // +   improved by: rezna
+          // +   input by: Rick Waldron
+          // +   reimplemented by: Brett Zamir (http://brett-zamir.me)
+          // +   input by: Brant Messenger (http://www.brantmessenger.com/)
+          // +   bugfixed by: Brett Zamir (http://brett-zamir.me)
+          // *     example 1: stripslashes('Kevin\'s code');
+          // *     returns 1: "Kevin's code"
+          // *     example 2: stripslashes('Kevin\\\'s code');
+          // *     returns 2: "Kevin\'s code"
+          return (str + '').replace(/\\(.?)/g, function (s, n1) {
+            switch (n1) {
+            case '\\':
+              return '\\';
+            case '0':
+              return '\u0000';
+            case '':
+              return '';
+            default:
+              return n1;
+            }
+          });
+        }
+    </script>
+{% endblock %}

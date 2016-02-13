@@ -1,0 +1,38 @@
+
+<html>
+<head>
+   <link rel="stylesheet" href="/bundles/nostalgiaz/bootstrap-switch/static/stylesheets/bootstrap-switch.css" type="text/css" media="all" />
+</head>
+<body>
+<form>
+    <div class="switch"><input type="checkbox" checked /></div>
+</form>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src=" {{ asset('bundles/nostalgiaz/bootstrap-switch/static/js/bootstrap-switch.min.js') }}"></script>
+
+    {% javascripts
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-transition.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-alert.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-modal.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-dropdown.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-scrollspy.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-tab.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-tooltip.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-popover.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-button.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-collapse.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-carousel.js'
+        '@MopaBootstrapBundle/Resources/bootstrap/js/bootstrap-typeahead.js'
+        '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
+        '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
+        '@MopaBootstrapBundle/Resources/public/js/eyecon-bootstrap-datepicker.js'
+    %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+
+
+ 
+</body>
+</html>

@@ -1,0 +1,77 @@
+parameters:
+    tsk_contract.imports.clause_file: "%kernel.root_dir%/../src/TSK/ContractBundle/Resources/files/REF_CONTRACT_CLAUSES.csv"
+    tsk_contract.admin.edit_template: TSKContractBundle:Admin:edit.html.twig
+    tsk_contract.admin.contract_template_edit_template: TSKContractBundle:Admin:contract_template_base_edit.html.twig
+
+services:
+    tsk.twig.string:
+        class: %twig.class%
+        arguments: [@tsk.twig.string.loader, %twig.options%]
+
+    tsk.twig.string.loader:
+        class: Twig_Loader_String
+
+    tsk.contract.admin:
+        class: TSK\ContractBundle\Admin\ContractAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Contracts" }
+        arguments: [null, TSK\ContractBundle\Entity\Contract, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', %tsk_contract.admin.edit_template%] ]
+            - [ getOrgSchool, [@session,  %tsk_user.session.org_key%,  %tsk_user.session.school_key%] ]
+            - [ addExtension, [@tsk.contract.admin_extension] ]
+
+
+    tsk.contract.template_admin:
+        class: TSK\ContractBundle\Admin\ContractTemplateAdmin
+        tags:
+            - { name: sonata.admin, manager_type: "orm", group: "Programs", label: "Contract Templates" }
+        arguments: [null, TSK\ContractBundle\Entity\ContractTemplate, SonataAdminBundle:CRUD]
+        calls:
+            - [ setTranslationDomain, [SonataAdminBundle] ]
+            - [ setTemplate, ['edit', %tsk_contract.admin.contract_template_edit_template%] ]
+
+    tsk.contract.admin_extension:
+        class: TSK\ContractBundle\Admin\ContractAdminExtension
+        arguments: [@session, %tsk_user.session.org_key%, %tsk_user.session.school_key%]
+ 
+    tsk_contract.postPersist.listener:
+        class: TSK\ContractBundle\Listener\ContractSaveListener
+        tags: 
+            - { name: doctrine.event_listener, event: postPersist, method: postPersist }
+            - { name: doctrine.event_listener, event: postUpdate, method: postUpdate }
+
+    tsk_contract.form.contractUpgrade:
+        class: TSK\ContractBundle\Form\ContractUpgradeFormType
+        arguments: [@session, %tsk_user.session.org_key%]
+        tags:
+            - { name: form.type, alias: contractUpgrade }
+        scope: prototype
+
+    tsk_contract.form.flow.contractUpgrade:
+        class: TSK\ContractBundle\Form\ContractUpgradeFlow
+        scope: prototype
+        parent: craue.form.flow
+        calls: 
+            - [ setFormType, [@tsk_contract.form.contractUpgrade ] ]
+
+    # tsk_contract.form.contractModifier:
+    #     class: TSK\ContractBundle\Form\ContractModifierFormType
+    #     arguments: [@session, %tsk_user.session.org_key%]
+    #     tags:
+    #         - { name: form.type, alias: contractModifier }
+    #     scope: prototype
+
+    # tsk_contract.form.flow.contractModifier:
+    #     class: TSK\ContractBundle\Form\ContractModifierFlow
+    #     scope: prototype
+    #     parent: craue.form.flow
+    #     calls: 
+    #         - [ setFormType, [@tsk_contract.form.contractModifier ] ]
+
+    tsk_contract.eventlistener.contract_log:
+        class:  TSK\ContractBundle\EventListener\ContractLogListener
+        arguments: [@doctrine.orm.entity_manager, @logger]
+        tags:
+            - { name: kernel.event_listener, event: tsk.contract.cancel, method: onCancelAction }

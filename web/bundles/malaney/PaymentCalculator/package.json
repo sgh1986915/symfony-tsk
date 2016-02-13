@@ -1,0 +1,24 @@
+{
+  "name": "payment_calculator",
+  "version": "0.1.1",
+  "description": "A javascript library for computing payments toward a principal based on a number of payments.",
+  "main": "src/PaymentCalculator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@bitbucket.org/malaney/payment-calculator.git"
+  },
+  "keywords": [
+    "payment",
+    "calculator",
+    "principal",
+    "rounding",
+    "money"
+  ],
+  "author": "Malaney J. Hill",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "private": true
+}

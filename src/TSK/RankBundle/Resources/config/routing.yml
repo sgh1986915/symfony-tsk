@@ -1,0 +1,3 @@
+tsk_rank_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: TSKRankBundle:Default:index }

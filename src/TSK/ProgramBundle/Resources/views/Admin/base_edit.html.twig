@@ -1,0 +1,111 @@
+{% extends 'TSKUserBundle:CRUD:base_edit.html.twig' %}
+{% block javascripts %}
+    {{ parent() }}
+
+    <script type="text/javascript" src="/bundles/tskpayment/js/paymentCalculator.js"></script>
+    <script type="text/javascript" src="/bundles/janl/mustache.js/mustache.js"></script>
+    <script type="text/javascript" src="/bundles/malaney/PaymentCalculator/src/PaymentCalculator.js"></script>
+    <script src="{{ asset('bundles/fosjsrouting/js/router.js') }}"></script>
+    <script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+
+    <script type="text/javascript">
+        // Your JS code here
+    $(document).ready(function() {
+        $('#previewDeferral').click(function(e) {
+            var dds = $('select[id$="deferralDistributionStrategy"]').val();
+            var ddm = $('input[id$="deferralDurationMonths"]').val();
+            var dr = $('input[id$="deferralRate"]').val();
+            var rr = $('input[id$="recognitionRate"]').val();
+            var rc = $('input[id$="recognitionCap"]').val();
+            var url = Routing.generate('deferral_graph', {strategy: dds, rate: dr, principal: 1000, recognitionRate: rr, recognitionCap: rc, periods: ddm})
+            $.get(url, function(data) {
+                $('#deferralPreview .modal-body').empty();
+                $('#deferralPreview .modal-body').html(data);
+                $('#deferralPreview').modal('show');
+            });
+            e.preventDefault();
+            return false;
+        });
+
+        $('span.paycal_txt a').click(function(e) {
+            // load payment
+            // $pd = $("textarea[id$=paymentsData]")
+            // var $pd = $(this).closest('textarea[id$=paymentsData]');
+var $pd = $(this).closest('td').find('textarea[id$=paymentsData]');
+            console.log($pd);
+            if ($pd) {
+                obj = JSON.parse($pd.val());
+                var url = '{{path('tsk_payment_default_cust')}}';
+                var d = openInDialog(this, url, {'paymentsData': obj});
+            }
+            e.preventDefault();
+            return false;
+        });
+
+    $dialog = $('<div></div>').dialog({
+        autoOpen: false,
+        width: 580,
+        modal: true,
+        show: 'fade',
+        hide: 'fade'
+    });
+
+    function openInDialog(element, target, data) 
+    {
+        var $url = target;
+        var $title = "Calculate Payments"; 
+        $dialog.empty();
+        $dialog.dialog("option", "title", $title);
+
+        if (data) {
+            $dialog.load($url, data, function() {
+                $dialog.data('summary_div', $(element)).data('textarea', $('[id$=paymentsData]')).dialog('open');
+                $dialog.dialog('open');
+            });
+        } else {
+            $dialog.load($url, function() {
+                $dialog.dialog('open');
+            });
+        }
+        return $dialog;
+    }
+    });
+
+    </script>
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!--  // styling for rules -->
+    <style type="text/css">
+        .sonata-bc .row-fluid td .span5 {
+            width: 90%;
+        }
+        .sonata-bc .row-fluid .conjunctionPicker {
+            width: 80%;
+        }
+        .sonata-collection-row .control-group .control-label {
+            width: 1px;
+            display: none;
+        }
+        .sonata-bc .form-horizontal td .controls {
+            margin-left: 10px;
+        }
+        .sonata-bc .form-horizontal .control-label {
+        }
+
+    </style>
+{% endblock %}
+
+{% block form %}
+    {{ parent() }} 
+
+<div id="deferralPreview" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+{% endblock form %}
+

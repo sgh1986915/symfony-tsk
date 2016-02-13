@@ -1,0 +1,15 @@
+{% if form.charges.vars.value %}
+    {{ form_errors(form.charges) }}
+    {{ form_widget(form.charges) }}
+<div class="total_row">
+    <div>
+        <button id="clear">Clear Payment</button>
+        <button id="auto_apply">Auto Apply Payment</button>
+    </div>
+    <div>Total</div>
+    <div id="openChargeTotal"></div>
+    <div id="appliedPaymentsTotal"></div>
+</div>
+{% else %}
+    No open charges for selected contact
+{% endif %}

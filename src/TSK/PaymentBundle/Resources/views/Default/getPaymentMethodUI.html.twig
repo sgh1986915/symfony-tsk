@@ -1,0 +1,17 @@
+{% if form.creditCardNumber is defined %}
+    {{ form_errors(form.creditCardNumber) }}
+    {{ form_label(form.creditCardNumber) }}
+    {{ form_widget(form.creditCardNumber) }}
+{% endif %}
+
+{% if form.creditCardExpirationDate is defined %}
+    {{ form_errors(form.creditCardExpirationDate) }}
+    {{ form_label(form.creditCardExpirationDate) }}
+    {{ form_widget(form.creditCardExpirationDate) }}
+{% endif %}
+
+{% if form.cvvNumber is defined %}
+    {{ form_errors(form.cvvNumber) }}
+    {{ form_label(form.cvvNumber) }}
+    {{ form_widget(form.cvvNumber) }}
+{% endif %}

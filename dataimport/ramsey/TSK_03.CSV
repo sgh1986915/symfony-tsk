@@ -1,0 +1,16 @@
+legacy program id,name of payment plan,total price,payment string,deferral duration months,deferral duration strategy,deferral_rate,is_active
+2392-1M-1YR,12 Payments,2868,239;239;239;239;239;239;239;239;239;239;239;239,0,,,1
+2392-1M-1YR,6 Payments,2629,439;438;438;438;438;438,11,accelerated,0.8,1
+2392-1M-1YR,Single Payment,2390,2390,10,accelerated,0.8,1
+2392-1M-PRO,12 Payments,5736,478;478;478;478;478;478;478;478;478;478;478;478,23,accelerated,0.75,1
+2392-1M-PRO,Single Payment,5162,5162,23,accelerated,0.75,1
+2392-2M-1YR,12 Payments,2292,191;191;191;191;191;191;191;191;191;191;191;191,0,,,1
+2392-2M-1YR,6 Payments,2101,351;350;350;350;350;350,11,accelerated,0.8,1
+2392-2M-1YR,Single Payment,1910,1910,10,accelerated,0.8,1
+2392-2M-PRO,12 Payments,4584,382;382;382;382;382;382;382;382;382;382;382;382,23,accelerated,0.75,1
+2392-2M-PRO,Single Payment,4125,4125,23,accelerated,0.75,1
+2392-3M-1YR,12 Payments,1716,143;143;143;143;143;143;143;143;143;143;143;143,0,,,1
+2392-3M-1YR,6 Payments,1573,263;262;262;262;262;262,11,accelerated,0.8,1
+2392-3M-1YR,Single Payment,1430,1430,10,accelerated,0.8,1
+2392-3M-PRO,12 Payments,3432,286;286;286;286;286;286;286;286;286;286;286;286,23,accelerated,0.75,1
+2392-3M-PRO,Single Payment,3088,3088,23,accelerated,0.75,1

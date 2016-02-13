@@ -1,0 +1,21 @@
+{% block tsk_payment_plan_selector_form_type_widget %}
+    {% spaceless %}
+        {% if expanded %}
+            <ul {{ block('widget_container_attributes') }}>
+            {% for child in form %}
+                <li>
+                    {{ form_widget(child) }}
+                    {{ form_label(child) }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            {# just let the choice widget render the select tag #}
+            {{ form_widget(form) }}
+        <textarea style="display: none"></textarea>
+<button name="edit" style="margin-left: 8px; margin-top: -8px;" id="btnCustomize" class="btnPaymentCalculator">Customize Payment Plan</button>
+        <div class="paycal" style="display: none;"></div>
+        <div class="paycal_txt"><a href=""></a></div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
